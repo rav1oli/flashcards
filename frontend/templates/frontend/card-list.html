@@ -1,0 +1,60 @@
+{% extends "frontend/layout.html" %}
+{% load static %}
+{% load markdown_filter %}
+
+{% block scripts %}
+
+{% endblock %}
+
+{% block body %}
+
+    <main class="main">
+
+        <div class="list-modifiers">
+            <div class="left-list-modifiers">
+                <p>Filter By Tag: </p>
+                <select name="filter" class="filter-select">
+                    <option class="filter-tag" value="0">All Cards</option>
+                    <!-- render tag list with js -->
+                </select>
+                
+                <p>Sort By:</p>
+                <select name="sort" class="sort-select">
+                    <option class="sort-option" value="date_created">Oldest</option>
+                    <option class="sort-option" value="-date_created">Newest</option>
+                    <option class="sort-option" value="date_edited">Least Recently Edited</option>
+                    <option class="sort-option" value="-date_edited">Most Recently Edited</option>
+                    <option class="sort-option" value="date_last_reviewed">Least Recently Reviewed</option>
+                    <option class="sort-option" value="-date_last_reviewed">Most Recently Reviewed</option>
+                </select>
+            </div>
+    
+            <div class="list-edit-icons">
+                <img class="icon list-edit-icon list-bin-icon hoverable" src="{% static 'frontend/icons/bin.svg' %}" width="40px" height="40px" title="Delete Selected Cards" alt="Delete Selected Cards"/>     
+                <img class="icon list-edit-icon list-add-to-deck-icon hoverable" src="{% static 'frontend/icons/add.svg' %}" width="40px" height="40px" title="Add Cards To Decks" alt="Add Cards To Decks"/>
+                <img class="icon list-edit-icon list-add-tags-icon hoverable" src="{% static 'frontend/icons/tag.svg' %}" width="40px" height="40px" title="Add Tags to Cards" alt="Add Tags to Cards"/>
+            </div>
+        </div>
+
+        <div class="list card-list">
+
+            {% include 'frontend/partials/cards.html' %}
+
+            <a href="" class="last">
+                <div class="item create-card">
+                        
+                    <div class="card-front">
+                        <div class="wrapper">
+                            <img src="{% static 'frontend/icons/plus.svg' %}" width="40px" height="40px"/>
+                            <p>Create New Card</p>
+                        </div>
+                    </div>
+                    
+                </div>
+            </a>
+
+        </div>
+
+    </main>
+
+{% endblock %}

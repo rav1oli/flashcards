@@ -2,7 +2,7 @@
 # Create your models here.
 from django.db import models
 from django.contrib.auth.models import User
-from django.forms import ModelForm
+from django import forms
 
 class Tag(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -36,7 +36,7 @@ class Deck(models.Model):
     def __str__(self):
         return self.title
 
-class DeckForm(ModelForm):
+class DeckForm(forms.ModelForm):
     class Meta:
         model = Deck
         fields = ['title', 'description', 'cards']

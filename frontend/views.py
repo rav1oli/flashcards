@@ -1,14 +1,24 @@
-from typing import Any
+
 from django.db.models.query import QuerySet
 from django.shortcuts import render
 from django.views.generic.list import ListView
+from django.contrib.auth.forms import UserCreationForm
+from django.urls import reverse_lazy
+from django.views.generic import CreateView
+
 from .models import *
 
 # Create your views here.
+class SignUpView(CreateView):
+    form_class = UserCreationForm
+    success_url = reverse_lazy("login")
+    template_name = "registration/signup.html"
+    
+
 class CardList(ListView):
     model = Card
 
-    def get_queryset(self) -> QuerySet[Any]:
+    def get_queryset(self):
 
         order_by = self.request.GET.get('order_by', 'date_created')
         tag_id = int(self.request.GET.get('filter', 0))

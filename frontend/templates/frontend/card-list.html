@@ -13,13 +13,20 @@
         <div class="list-modifiers">
             <div class="left-list-modifiers">
                 <p>Filter By Tag: </p>
-                <select name="filter" class="filter-select">
-                    <option class="filter-tag" value="0">All Cards</option>
-                    <!-- render tag list with js -->
+                <select name="filter" class="filter-select" 
+                    hx-get="{% url 'card_list' %}"
+                    hx-trigger="change"
+                    hx-target="#cards-in-card-list">
+                    <option id="all-cards-tag" class="filter-tag" value="0" 
+                        hx-get="{% url 'tag_list' %}" 
+                        hx-trigger="load" 
+                        hx-target="this"
+                        hx-swap="afterend">
+                        All Cards</option>
                 </select>
                 
                 <p>Sort By:</p>
-                <select name="sort" class="sort-select">
+                <select name="order_by" class="sort-select" hx-get="{% url 'card_list' %}" hx-trigger="change" hx-target="#cards-in-card-list">
                     <option class="sort-option" value="date_created">Oldest</option>
                     <option class="sort-option" value="-date_created">Newest</option>
                     <option class="sort-option" value="date_edited">Least Recently Edited</option>
@@ -38,7 +45,7 @@
 
         <div class="list card-list">
 
-            {% include 'frontend/partials/cards.html' %}
+            <section id="cards-in-card-list" class="container">{% include 'frontend/partials/cards.html' %}</section>
 
             <a href="" class="last">
                 <div class="item create-card">

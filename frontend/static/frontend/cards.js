@@ -20,15 +20,21 @@ function flip(card){
     }, 300);
 }
 
-jQuery(function() {
+$(function() {
 
-    jQuery('.flip-icon').each(function(){
-        jQuery(this).on('click', function(e){
+    $('.flip-icon').each(function(){
+        $(this).on('click', function(e){
 
             e.stopPropagation();
-            flip(jQuery(this).parent('.card'));
+            flip($(this).parent('.card'));
 
         });
     });
+
+    $('.card').each(function(){
+        $(this).on('click', function(e){
+            $(this).toggleClass('selected');
+        })
+    })
 
 });

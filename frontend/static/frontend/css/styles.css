@@ -4,6 +4,10 @@
   box-sizing: border-box;
 }
 
+.container {
+  display: contents;
+}
+
 body {
   font-family: "Barlow", sans-serif;
 }

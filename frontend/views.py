@@ -9,9 +9,17 @@ class CardList(ListView):
     model = Card
 
     def get_queryset(self) -> QuerySet[Any]:
+
+        order_by = self.request.GET.get('order_by', 'date_created')
+        tag_id = int(self.request.GET.get('filter', 0))
+
         user = self.request.user
         if user.is_authenticated:
-            return Card.objects.filter(user=user)
+            user_cards = Card.objects.filter(user=user)
+            if tag_id == 0:
+                return user_cards.order_by(order_by)
+            else:
+                return user_cards.filter(tags__id=tag_id).order_by(order_by)
         else:
             return Card.objects.none
     
@@ -22,4 +30,7 @@ class CardList(ListView):
             template_name = "frontend/card-list.html"
         return [template_name]
 
-
+def tag_list(request):
+    return render(request, 'frontend/partials/tags.html', {
+        'tag_list': Tag.objects.all()
+    })

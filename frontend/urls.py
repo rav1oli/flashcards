@@ -1,8 +1,9 @@
 from django.urls import path
-from .views import *
+from . import views
 
 urlpatterns = [
-    path("cards", CardList.as_view(), name="card_list"),
+    path("cards", views.CardList.as_view(), name="card_list"),
+    path("tags", views.tag_list, name="tag_list")
 ]
 
 """ 

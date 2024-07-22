@@ -25,12 +25,19 @@ body {
 .navbar {
     display: flex;
     flex-direction: row;
+    justify-content: space-between;
+
     border-bottom: 1px solid black;
     width: 100%;
     position: sticky;
     top: 0;
     background-color: white;
     z-index: 51;
+
+    div {
+        display: flex;
+        flex-direction: row;
+    }
 }
 
 a {
@@ -38,17 +45,17 @@ a {
     text-decoration: none;
 }
 
+a:has(.nav-button):hover {
+    cursor: pointer;
+    text-decoration: underline;
+    background-color: #f4f3f0;
+}
+
 .nav-button {
     list-style-type: none;
     padding: 1em;
 
     transition: background-color, 0.2s;
-
-    &:hover {
-        cursor: pointer;
-        text-decoration: underline;
-        background-color: #f4f3f0;
-    }
 }
 
 

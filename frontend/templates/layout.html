@@ -8,7 +8,6 @@
         <!-- scripts -->
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
         <script src="{% static 'htmx.min.js' %}" defer></script>
-        <script src="{% static 'frontend/cards.js' %}"></script>
         {% block scripts %}{% endblock %}
 
         <!-- stylesheets -->
@@ -28,9 +27,20 @@
         <div class="grey-overlay"></div>
 
         <ul class="navbar">
-            <a href=""><li class="nav-button">Deck List</li></a>
-            <a href="{% url 'card_list' %}"><li class="nav-button">Card List</li></a>
-            <a href=""><li class="nav-button">Create Card</li></a>
+            <div>
+                <a href=""><li class="nav-button">Deck List</li></a>
+                <a href="{% url 'card_list' %}"><li class="nav-button">Card List</li></a>
+                <a href=""><li class="nav-button">Create Card</li></a>
+            </div>
+            <div>
+                {% if user.is_authenticated %}
+                    <li class="nav-button">Logged in as <b>{{ user.username }}</b></li>
+                    <a href="{% url 'logout' %}"><li class="nav-button">Log Out</li></a>
+                {% else %}
+                    <a href="{% url 'login' %}"><li class="nav-button">Log In</li></a>
+                    <a href="{% url 'signup' %}"><li class="nav-button">Sign Up</li></a>
+                {% endif %}
+            </div>
         </ul>
 
         {% block body %}{% endblock %}

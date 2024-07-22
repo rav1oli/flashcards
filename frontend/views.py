@@ -4,7 +4,7 @@ from django.shortcuts import render
 from django.views.generic.list import ListView
 from django.contrib.auth.forms import UserCreationForm
 from django.urls import reverse_lazy
-from django.views.generic import CreateView
+from django.views.generic import CreateView, TemplateView
 
 from .models import *
 
@@ -13,9 +13,12 @@ class SignUpView(CreateView):
     form_class = UserCreationForm
     success_url = reverse_lazy("login")
     template_name = "registration/signup.html"
-    
 
-class CardList(ListView):
+
+class IndexView(TemplateView):
+    template_name = "frontend/index.html"
+
+class CardListView(ListView):
     model = Card
 
     def get_queryset(self):

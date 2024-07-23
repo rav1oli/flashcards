@@ -308,13 +308,8 @@ hr {
   padding: 3px;
 }
 
-.grey-overlay {
-  z-index: 100;
-  width: 100%;
-  height: 100%;
-  position: fixed;
+::backdrop {
   background-color: rgba(0, 0, 0, 0.3);
-  display: none;
 }
 
 .list-modifiers {

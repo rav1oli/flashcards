@@ -35,8 +35,3 @@ class Deck(models.Model):
 
     def __str__(self):
         return self.title
-
-class DeckForm(forms.ModelForm):
-    class Meta:
-        model = Deck
-        fields = ['title', 'description', 'cards']

@@ -1,0 +1,8 @@
+<dialog open>
+    <form hx-post="/tag_card_form/{{ form.instance.id }}" hx-trigger="change" class="grey-form">
+        {% csrf_token %}
+        
+        {{ form.as_p }}
+    </form>
+</dialog>
+

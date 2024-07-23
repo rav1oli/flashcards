@@ -1,0 +1,6 @@
+{% for tag in tag_list %}
+
+    <input class="tag" id="{{ tag.name }}" name="tag" type="checkbox" value="{{ tag.id }}"></input>
+    <label for="{{ tag.name }}">{{ tag.name }}</label>
+
+{% endfor %}

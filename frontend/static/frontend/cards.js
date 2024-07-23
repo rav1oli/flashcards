@@ -20,7 +20,7 @@ function flip(card){
     }, 300);
 }
 
-$(function() {
+$(function(){
 
     $('.flip-icon').each(function(){
         $(this).on('click', function(e){
@@ -31,8 +31,8 @@ $(function() {
         });
     });
 
-    $('.card').each(function(){
-        $(this).on('click', function(e){
+    $('.selectable').each(function(){
+        $(this).on('click', function(){
             $(this).toggleClass('selected');
         })
     })

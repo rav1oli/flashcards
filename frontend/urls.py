@@ -5,8 +5,11 @@ urlpatterns = [
     path('accounts/signup/', views.SignUpView.as_view(), name="signup"),
 
     path("", views.IndexView.as_view(), name="index"),
-    path("cards", views.CardListView.as_view(), name="card_list"),
-    path("tags", views.tag_list, name="tag_list")
+    path("cards", views.CardListTemplateView.as_view(), name="cards"),
+    path("card_list", views.CardListView.as_view(), name="card_list"),
+    path("tags", views.TagSelectView.as_view(), name="tag_select"),
+    path("tag_card_form/<pk>", views.tag_card_form, name="tag_card_form"),
+    path("delete_card/<pk>", views.delete_card, name="delete_card"),
 ]
 
 """ 

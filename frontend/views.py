@@ -1,12 +1,14 @@
 
-from django.db.models.query import QuerySet
 from django.shortcuts import render
 from django.views.generic.list import ListView
 from django.contrib.auth.forms import UserCreationForm
-from django.urls import reverse_lazy
-from django.views.generic import CreateView, TemplateView
+from django.urls import reverse_lazy, reverse
+from django.views.generic import CreateView, TemplateView, UpdateView
+from django.http import HttpResponseRedirect, HttpResponse
+from django_htmx.http import HttpResponseClientRedirect
 
 from .models import *
+from .forms import *
 
 # Create your views here.
 class SignUpView(CreateView):
@@ -18,8 +20,19 @@ class SignUpView(CreateView):
 class IndexView(TemplateView):
     template_name = "frontend/index.html"
 
+
+class CardListTemplateView(TemplateView):
+    template_name = "frontend/card-list.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['card_list'] = Card.objects.filter(user=self.request.user)
+        return context
+
+
 class CardListView(ListView):
     model = Card
+    template_name = "frontend/partials/cards.html"
 
     def get_queryset(self):
 
@@ -35,15 +48,32 @@ class CardListView(ListView):
                 return user_cards.filter(tags__id=tag_id).order_by(order_by)
         else:
             return Card.objects.none
-    
-    def get_template_names(self):
-        if self.request.htmx:
-            template_name = "frontend/partials/cards.html"
-        else:
-            template_name = "frontend/card-list.html"
-        return [template_name]
 
-def tag_list(request):
-    return render(request, 'frontend/partials/tags.html', {
-        'tag_list': Tag.objects.all()
-    })
+
+class TagSelectView(ListView):
+    template_name = "frontend/partials/tag-select.html"
+
+    def get_queryset(self):
+        return Tag.objects.filter(user=self.request.user)
+    
+
+def tag_card_form(request, pk):
+    card = Card.objects.get(pk=pk)
+
+    if request.method == "POST":
+        form = TagCheckboxForm(request.POST, context={'user': request.user}, instance=card)
+        if form.is_valid():
+            form.save()
+            return 
+        else: 
+            return HttpResponseClientRedirect(reverse('cards'))
+    else: 
+        form = TagCheckboxForm(context={'user': request.user}, instance=card)
+        return render(request, 'frontend/partials/tag-card-form.html', {'form': form})
+
+
+def delete_card(request, pk):
+    if request.method == "DELETE":
+        Card.objects.get(pk=pk).delete()
+
+        return HttpResponseClientRedirect(reverse('card_list'))

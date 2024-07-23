@@ -15,10 +15,11 @@ body {
         opacity: 0.8;
         pointer-events: auto;
     }
+}
 
-    &:has(.grey-form) .grey-overlay{
-        display: block;
-    }
+dialog::backdrop {
+    background-color: grey;
+    opacity: 0.5;
 }
 
 /* nav styling */
@@ -335,10 +336,6 @@ hr {
     .tag-wrapper{
         padding: 3px;
     }
-}
-
-::backdrop {
-    background-color: rgb(0,0,0,0.3);
 }
 
 .list-modifiers {

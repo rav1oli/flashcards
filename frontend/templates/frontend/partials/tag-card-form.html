@@ -1,8 +1,17 @@
-<dialog open>
-    <form hx-post="/tag_card_form/{{ form.instance.id }}" hx-trigger="change" class="grey-form">
+<dialog>
+    <form hx-post="/tag_card_form/{{ form.instance.id }}" hx-target="closest dialog" hx-swap="outerHTML" class="grey-form">
         {% csrf_token %}
         
         {{ form.as_p }}
+
+        <button type="submit" class="form-button close-button">Close</button> <!-- make this a lil x button in the corner -->
     </form>
+
+    <script>
+        dialog = document.querySelector('dialog');
+        dialog.showModal();
+    </script>
 </dialog>
+
+
 

@@ -10,6 +10,13 @@ from django_htmx.http import HttpResponseClientRedirect
 from .models import *
 from .forms import *
 
+def get_user_cards(user):
+    if user.is_authenticated:
+        return Card.objects.filter(user=user)
+    else:
+        return Card.objects.none
+
+
 # Create your views here.
 class SignUpView(CreateView):
     form_class = UserCreationForm
@@ -26,7 +33,7 @@ class CardListTemplateView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['card_list'] = Card.objects.filter(user=self.request.user)
+        context['card_list'] = get_user_cards(self.request.user)
         return context
 
 
@@ -39,15 +46,12 @@ class CardListView(ListView):
         order_by = self.request.GET.get('order_by', 'date_created')
         tag_id = int(self.request.GET.get('filter', 0))
 
-        user = self.request.user
-        if user.is_authenticated:
-            user_cards = Card.objects.filter(user=user)
-            if tag_id == 0:
-                return user_cards.order_by(order_by)
-            else:
-                return user_cards.filter(tags__id=tag_id).order_by(order_by)
+        card_list = get_user_cards(self.request.user)
+
+        if tag_id == 0:
+            return card_list.order_by(order_by)
         else:
-            return Card.objects.none
+            return card_list.filter(tags__id=tag_id).order_by(order_by)
 
 
 class TagSelectView(ListView):
@@ -64,9 +68,9 @@ def tag_card_form(request, pk):
         form = TagCheckboxForm(request.POST, context={'user': request.user}, instance=card)
         if form.is_valid():
             form.save()
-            return 
+            return HttpResponse("")
         else: 
-            return HttpResponseClientRedirect(reverse('cards'))
+            return render(request, 'frontend/partials/tag-card-form.html', {'form': form})
     else: 
         form = TagCheckboxForm(context={'user': request.user}, instance=card)
         return render(request, 'frontend/partials/tag-card-form.html', {'form': form})
@@ -76,4 +80,4 @@ def delete_card(request, pk):
     if request.method == "DELETE":
         Card.objects.get(pk=pk).delete()
 
-        return HttpResponseClientRedirect(reverse('card_list'))
+        return HttpResponse("")

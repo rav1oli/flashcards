@@ -11,7 +11,8 @@
             <img class="icon hoverable card-edit-icon card-bin-icon" src="{% static 'frontend/icons/bin.svg' %}" width="25px" height="25px" title="Delete Card" alt="Delete Card"
                 hx-delete="{% url 'delete_card' pk=card.id %}"
                 hx-trigger="click"
-                hx-target="#cards-in-card-list"/>
+                hx-target="closest .card"
+                hx-swap="outerHTML"/>
             <a href=""><img class="icon hoverable card-edit-icon card-pencil-icon" src="{% static 'frontend/icons/pencil.svg' %}" width="25px" height="25px" title="Edit Card" alt="Edit Card"/></a>
             <img class="icon hoverable card-edit-icon card-add-to-deck-icon" src="{% static 'frontend/icons/add.svg' %}" width="25px" height="25px" title="Add Card to Decks" alt="Add Card to Decks"/>
             <img class="icon hoverable card-edit-icon card-add-tags-icon" src="{% static 'frontend/icons/tag.svg' %}" width="25px" height="25px" title="Set Tags for Card" alt="Set Tags for Card"

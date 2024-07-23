@@ -15,8 +15,10 @@ body:has(.selected) .list-edit-icons {
   opacity: 0.8;
   pointer-events: auto;
 }
-body:has(.grey-form) .grey-overlay {
-  display: block;
+
+dialog::backdrop {
+  background-color: grey;
+  opacity: 0.5;
 }
 
 /* nav styling */
@@ -306,10 +308,6 @@ hr {
 }
 .tags-in-form .tag-wrapper {
   padding: 3px;
-}
-
-::backdrop {
-  background-color: rgba(0, 0, 0, 0.3);
 }
 
 .list-modifiers {

@@ -26,3 +26,7 @@ class TagCheckboxForm(DynamicFormMixin, forms.ModelForm):
     class Meta:
         model = Card
         fields = ['tags']
+
+
+class DeckSelectForm(DynamicFormMixin, form.ModelForm):
+    decks = DynamicField()

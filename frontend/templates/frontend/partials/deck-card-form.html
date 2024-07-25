@@ -1,6 +1,6 @@
 <dialog>
     <form class="grey-form" 
-        hx-post="{% url 'tag_card_form' form.instance.id %}" 
+        hx-post="{% url 'deck_card_form' form.instance.id %}" 
         hx-target="closest dialog" 
         hx-swap="outerHTML" >
         {% csrf_token %}
@@ -15,6 +15,3 @@
         dialog.showModal();
     </script>
 </dialog>
-
-
-

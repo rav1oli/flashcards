@@ -31,10 +31,4 @@ $(function(){
         });
     });
 
-    $('.selectable').each(function(){
-        $(this).on('click', function(){
-            $(this).toggleClass('selected');
-        })
-    })
-
 });

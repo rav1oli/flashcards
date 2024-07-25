@@ -5,17 +5,12 @@ from django.contrib.auth.forms import UserCreationForm
 from django.urls import reverse_lazy, reverse
 from django.views.generic import CreateView, TemplateView, UpdateView
 from django.http import HttpResponseRedirect, HttpResponse
+from django.forms import inlineformset_factory
 from django_htmx.http import HttpResponseClientRedirect
 
 from .models import *
 from .forms import *
-
-def get_user_cards(user):
-    if user.is_authenticated:
-        return Card.objects.filter(user=user)
-    else:
-        return Card.objects.none
-
+from .util import *
 
 # Create your views here.
 class SignUpView(CreateView):
@@ -61,6 +56,37 @@ class TagSelectView(ListView):
         return Tag.objects.filter(user=self.request.user)
     
 
+def create_card_form(request):
+
+    if request.method == "POST":
+        form = CardForm(request.POST, context={'user': request.user})
+        if form.is_valid():
+            form.instance.user = request.user
+            form.save()
+            return HttpResponseRedirect(reverse('cards'))
+        else: 
+            return render(request, 'frontend/card-create-form.html', {'form': form})
+    else: 
+        form = CardForm(context={'user': request.user})
+        return render(request, 'frontend/card-create-form.html', {'form': form})
+
+
+def update_card_form(request, pk):
+    card = Card.objects.get(pk=pk)
+
+    if request.method == "POST":
+        form = CardForm(request.POST, context={'user': request.user}, instance=card)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect('/cards')
+        else: 
+            return render(request, 'frontend/card-create-form.html', {'form': form})
+    
+    else:
+        form = CardForm(context={'user': request.user}, instance=card)
+        return render(request, 'frontend/card-create-form.html', {'form': form})
+
+
 def tag_card_form(request, pk):
     card = Card.objects.get(pk=pk)
 
@@ -74,6 +100,24 @@ def tag_card_form(request, pk):
     else: 
         form = TagCheckboxForm(context={'user': request.user}, instance=card)
         return render(request, 'frontend/partials/tag-card-form.html', {'form': form})
+    
+
+#identical to tag_card_form but with different form. If i were a better coder I would make a common class or something (but honestly what's the point)
+#I mean django already has the classes but ill be damned if I know how to use them.
+def deck_card_form(request, pk):
+    card = Card.objects.get(pk=pk)
+
+    if request.method == "POST":
+        form = DeckSelectForm(request.POST, context={'user': request.user}, instance=card)
+        if form.is_valid():
+            form.save()
+            return HttpResponse("")
+        else: 
+            return render(request, 'frontend/partials/deck-card-form.html', {'form': form})
+    
+    else:
+        form = DeckSelectForm(context={'user': request.user}, instance=card)
+        return render(request, 'frontend/partials/deck-card-form.html', {'form': form})
 
 
 def delete_card(request, pk):

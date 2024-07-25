@@ -8,6 +8,7 @@
         <!-- scripts -->
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
         <script src="{% static 'htmx.min.js' %}" defer></script>
+        <script src="https://unpkg.com/hyperscript.org@0.9.12"></script>
         {% block scripts %}{% endblock %}
 
         <!-- stylesheets -->
@@ -30,7 +31,7 @@
             <div>
                 <a href=""><li class="nav-button">Deck List</li></a>
                 <a href="{% url 'cards' %}"><li class="nav-button">Card List</li></a>
-                <a href=""><li class="nav-button">Create Card</li></a>
+                <a href="{% url 'create_card' %}"><li class="nav-button">Create Card</li></a>
             </div>
             <div>
                 {% if user.is_authenticated %}

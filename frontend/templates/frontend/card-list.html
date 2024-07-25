@@ -16,17 +16,25 @@
                 <select name="filter" class="filter-select" 
                     hx-get="{% url 'card_list' %}"
                     hx-trigger="change"
-                    hx-target="#cards-in-card-list">
+                    hx-target="#cards-in-card-list"
+                    hx-push-url="true">
+
                     <option id="all-cards-tag" class="filter-tag" value="0" 
                         hx-get="{% url 'tag_select' %}" 
                         hx-trigger="load" 
                         hx-target="this"
-                        hx-swap="afterend">
+                        hx-swap="afterend"
+                        hx-push-url="false">
                         All Cards</option>
                 </select>
                 
                 <p>Sort By:</p>
-                <select name="order_by" class="sort-select" hx-get="{% url 'card_list' %}" hx-trigger="change" hx-target="#cards-in-card-list">
+                <select name="order_by" class="sort-select" 
+                    hx-get="{% url 'card_list' %}" 
+                    hx-trigger="change" 
+                    hx-target="#cards-in-card-list"
+                    hx-push-url="true">
+
                     <option class="sort-option" value="date_created">Oldest</option>
                     <option class="sort-option" value="-date_created">Newest</option>
                     <option class="sort-option" value="date_edited">Least Recently Edited</option>
@@ -37,7 +45,12 @@
             </div>
     
             <div class="list-edit-icons">
-                <img class="icon list-edit-icon list-bin-icon hoverable" src="{% static 'frontend/icons/bin.svg' %}" width="40px" height="40px" title="Delete Selected Cards" alt="Delete Selected Cards"/>     
+                <!-- delete requests are weird so imma use post for this one -->
+                <img class="icon list-edit-icon list-bin-icon hoverable" src="{% static 'frontend/icons/bin.svg' %}" width="40px" height="40px" title="Delete Selected Cards" alt="Delete Selected Cards"
+                    hx-post="{% url 'delete_cards' %}" 
+                    hx-include=".selected, .left-list-modifiers"
+                    hx-target="#cards-in-card-list"/>
+
                 <img class="icon list-edit-icon list-add-to-deck-icon hoverable" src="{% static 'frontend/icons/add.svg' %}" width="40px" height="40px" title="Add Cards To Decks" alt="Add Cards To Decks"/>
                 <img class="icon list-edit-icon list-add-tags-icon hoverable" src="{% static 'frontend/icons/tag.svg' %}" width="40px" height="40px" title="Add Tags to Cards" alt="Add Tags to Cards"/>
             </div>

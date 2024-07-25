@@ -12,6 +12,18 @@ from .models import *
 from .forms import *
 from .util import *
 
+def get_filtered_and_sorted_user_cards(request):
+    order_by = request.POST.get('order_by', 'date_created')
+    tag_id = int(request.POST.get('filter', 0))
+    print(tag_id)
+
+    card_list = get_user_cards(request.user)
+
+    if tag_id == 0:
+        return card_list.order_by(order_by)
+    else:
+        return card_list.filter(tags__id=tag_id).order_by(order_by)
+
 # Create your views here.
 class SignUpView(CreateView):
     form_class = UserCreationForm
@@ -23,19 +35,15 @@ class IndexView(TemplateView):
     template_name = "frontend/index.html"
 
 
-class CardListTemplateView(TemplateView):
-    template_name = "frontend/card-list.html"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['card_list'] = get_user_cards(self.request.user)
-        return context
-
-
 class CardListView(ListView):
     model = Card
-    template_name = "frontend/partials/cards.html"
 
+    def get_template_names(self):
+        if self.request.htmx:
+            return ['frontend/partials/cards.html']
+        else:
+            return ['frontend/card-list.html']
+        
     def get_queryset(self):
 
         order_by = self.request.GET.get('order_by', 'date_created')
@@ -63,7 +71,7 @@ def create_card_form(request):
         if form.is_valid():
             form.instance.user = request.user
             form.save()
-            return HttpResponseRedirect(reverse('cards'))
+            return HttpResponseRedirect(reverse('create_card'))
         else: 
             return render(request, 'frontend/card-create-form.html', {'form': form})
     else: 
@@ -78,7 +86,7 @@ def update_card_form(request, pk):
         form = CardForm(request.POST, context={'user': request.user}, instance=card)
         if form.is_valid():
             form.save()
-            return HttpResponseRedirect('/cards')
+            return HttpResponseRedirect(reverse('card_list'))
         else: 
             return render(request, 'frontend/card-create-form.html', {'form': form})
     
@@ -125,3 +133,16 @@ def delete_card(request, pk):
         Card.objects.get(pk=pk).delete()
 
         return HttpResponse("")
+    
+
+def delete_cards(request):
+    if request.method == "POST":
+
+        card_ids_str = request.POST.getlist('card_id')
+        card_ids = [int(id) for id in card_ids_str]
+        Card.objects.filter(pk__in=card_ids).delete()
+
+        card_list = get_filtered_and_sorted_user_cards(request)
+
+        return render(request, 'frontend/partials/cards.html', {'card_list': card_list})
+    

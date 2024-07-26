@@ -77,6 +77,7 @@ def order_select_list(request):
         'form': form,
     })
 
+
 def create_card_form(request):
 
     if request.method == "POST":
@@ -129,7 +130,7 @@ def deck_card_form(request, pk):
     card = Card.objects.get(pk=pk)
 
     if request.method == "POST":
-        form = DeckSelectForm(request.POST, context={'user': request.user}, instance=card)
+        form = DeckSelectModelForm(request.POST, context={'user': request.user}, instance=card)
         if form.is_valid():
             form.save()
             return HttpResponse("")
@@ -137,8 +138,31 @@ def deck_card_form(request, pk):
             return render(request, 'frontend/partials/deck-card-form.html', {'form': form})
     
     else:
-        form = DeckSelectForm(context={'user': request.user}, instance=card)
+        form = DeckSelectModelForm(context={'user': request.user}, instance=card)
         return render(request, 'frontend/partials/deck-card-form.html', {'form': form})
+
+
+def deck_card_multiple_form(request):
+
+    if request.method == "POST":
+        form = DeckSelectForm(request.POST, context={'user': request.user})
+        card_ids = request.POST.getlist('card_id')
+        card_ids = [int(id) for id in card_ids]
+        cards = Card.objects.filter(pk__in=card_ids)
+
+        if form.is_valid():
+            decks = form.cleaned_data.get('decks', [])
+            for card in cards:
+                for deck in decks:
+                    card.decks.add(deck)
+
+            return HttpResponse("")
+        else: 
+            return render(request, 'frontend/partials/deck-card-multiple-form.html', {'form': form})
+    
+    else:
+        form = DeckSelectForm(context={'user': request.user})
+        return render(request, 'frontend/partials/deck-card-multiple-form.html', {'form': form})
 
 
 def delete_card(request, pk):
@@ -151,8 +175,8 @@ def delete_card(request, pk):
 def delete_cards(request):
     if request.method == "POST":
 
-        card_ids_str = request.POST.getlist('card_id')
-        card_ids = [int(id) for id in card_ids_str]
+        card_ids = request.POST.getlist('card_id')
+        card_ids = [int(id) for id in card_ids]
         Card.objects.filter(pk__in=card_ids).delete()
 
         card_list = get_filtered_and_sorted_user_cards(request, True)

@@ -88,7 +88,7 @@ class TagCheckboxForm(DynamicFormMixin, forms.ModelForm):
         fields = ['tags']
 
 
-class DeckSelectForm(DynamicFormMixin, forms.ModelForm):
+class DeckSelectModelForm(DynamicFormMixin, forms.ModelForm):
 
     class Meta:
         model = Card
@@ -122,6 +122,13 @@ class DeckSelectForm(DynamicFormMixin, forms.ModelForm):
         return card_instance
 
 
+class DeckSelectForm(DynamicFormMixin, forms.Form):
+    decks = DynamicField(
+        forms.ModelMultipleChoiceField,
+        queryset=lambda form: Deck.objects.filter(user=form.context['user']),
+        widget=lambda _: forms.CheckboxSelectMultiple,
+        required=False,
+    )
 
     
 

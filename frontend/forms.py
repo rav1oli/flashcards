@@ -68,8 +68,8 @@ class OrderSelectForm(forms.Form):
         ("-date_created", "Newest"),
         ("date_edited", "Least Recently Edited"),
         ("-date_edited", "Most Recently Edited"),
-        ("date_reviewed", "Least Recently Reviewed"),
-        ("-date_reviewed", "Most Recently Reviewed"),
+        ("date_last_reviewed", "Least Recently Reviewed"),
+        ("-date_last_reviewed", "Most Recently Reviewed"),
     ]
 
     order_by = forms.ChoiceField(choices=ORDER_CHOICES)

@@ -12,10 +12,14 @@ from .models import *
 from .forms import *
 from .util import *
 
-def get_filtered_and_sorted_user_cards(request):
-    order_by = request.POST.get('order_by', 'date_created')
-    tag_id = int(request.POST.get('filter', 0))
-    print(tag_id)
+def get_filtered_and_sorted_user_cards(request, post=False):
+    if post:
+        order_by = request.POST.get('order_by', 'date_created')
+        tag_id = int(request.POST.get('filter', 0))
+    else:
+        order_by = request.GET.get('order_by', 'date_created')
+        tag_id = int(request.GET.get('filter', 0))
+    
 
     card_list = get_user_cards(request.user)
 
@@ -35,34 +39,43 @@ class IndexView(TemplateView):
     template_name = "frontend/index.html"
 
 
-class CardListView(ListView):
-    model = Card
+def card_list_view(request):
 
-    def get_template_names(self):
-        if self.request.htmx:
-            return ['frontend/partials/cards.html']
-        else:
-            return ['frontend/card-list.html']
-        
-    def get_queryset(self):
+    if request.htmx:
+        template_name = 'frontend/partials/cards.html'
 
-        order_by = self.request.GET.get('order_by', 'date_created')
-        tag_id = int(self.request.GET.get('filter', 0))
+        tag_id = int(request.GET.get('filter', 0))
+        request.session['preselected_tag'] = tag_id
 
-        card_list = get_user_cards(self.request.user)
+        order = request.GET.get('order_by', "date_created")
+        request.session['preselected_order'] = order
 
-        if tag_id == 0:
-            return card_list.order_by(order_by)
-        else:
-            return card_list.filter(tags__id=tag_id).order_by(order_by)
+    else:
+        template_name = 'frontend/card-list.html'
+
+    card_list = get_filtered_and_sorted_user_cards(request)
+
+    return render(request, template_name, {'card_list': card_list})
 
 
-class TagSelectView(ListView):
-    template_name = "frontend/partials/tag-select.html"
+def tag_select_list(request):
+    preselected_tag = request.session.get('preselected_tag', 0)
 
-    def get_queryset(self):
-        return Tag.objects.filter(user=self.request.user)
+    form = TagSelectForm(context={'user': request.user,}, initial={'tags': preselected_tag})
+
+    return render(request, 'frontend/partials/tag-select-list.html', {
+        'form': form,
+    })
     
+
+def order_select_list(request):
+    preselected_order = request.session.get('preselected_order', "date_created")
+
+    form = OrderSelectForm(initial={'order_by': preselected_order})
+
+    return render(request, 'frontend/partials/order-select-list.html', {
+        'form': form,
+    })
 
 def create_card_form(request):
 
@@ -142,7 +155,7 @@ def delete_cards(request):
         card_ids = [int(id) for id in card_ids_str]
         Card.objects.filter(pk__in=card_ids).delete()
 
-        card_list = get_filtered_and_sorted_user_cards(request)
+        card_list = get_filtered_and_sorted_user_cards(request, True)
 
         return render(request, 'frontend/partials/cards.html', {'card_list': card_list})
     

@@ -2,7 +2,6 @@ from .models import *
 from django import forms
 from dynamic_forms import DynamicField, DynamicFormMixin
 
-
 class DeckForm(forms.ModelForm):
 
     class Meta:
@@ -59,7 +58,21 @@ class TagSelectForm(DynamicFormMixin, forms.Form):
     tags = DynamicField(
         forms.ModelChoiceField,
         queryset=lambda form: Tag.objects.filter(user=form.context['user']),
+        empty_label=None,
     )
+
+
+class OrderSelectForm(forms.Form):
+    ORDER_CHOICES = [
+        ("date_created", "Oldest"),
+        ("-date_created", "Newest"),
+        ("date_edited", "Least Recently Edited"),
+        ("-date_edited", "Most Recently Edited"),
+        ("date_reviewed", "Least Recently Reviewed"),
+        ("-date_reviewed", "Most Recently Reviewed"),
+    ]
+
+    order_by = forms.ChoiceField(choices=ORDER_CHOICES)
 
 
 class TagCheckboxForm(DynamicFormMixin, forms.ModelForm):

@@ -15,32 +15,40 @@
                 <p>Filter By Tag: </p>
                 <select name="filter" class="filter-select" 
                     hx-get="{% url 'card_list' %}"
+                    hx-include=".order-select"
                     hx-trigger="change"
                     hx-target="#cards-in-card-list"
                     hx-push-url="true">
 
                     <option id="all-cards-tag" class="filter-tag" value="0" 
-                        hx-get="{% url 'tag_select' %}" 
+                        hx-get="{% url 'tag_select_list' %}" 
                         hx-trigger="load" 
                         hx-target="this"
                         hx-swap="afterend"
                         hx-push-url="false">
                         All Cards</option>
                 </select>
+                <input type="hidden" name="preselected_tag" value="0" id="preselected-tag">
                 
                 <p>Sort By:</p>
-                <select name="order_by" class="sort-select" 
+                <select name="order_by" class="order-select" 
                     hx-get="{% url 'card_list' %}" 
+                    hx-include=".filter-select"
                     hx-trigger="change" 
                     hx-target="#cards-in-card-list"
                     hx-push-url="true">
 
-                    <option class="sort-option" value="date_created">Oldest</option>
-                    <option class="sort-option" value="-date_created">Newest</option>
+                    <option class="order-option" value="date_created"
+                        hx-get="{% url 'order_select_list' %}" 
+                        hx-trigger="load" 
+                        hx-target="this"
+                        hx-swap="outerHTML"
+                        hx-push-url="false">Oldest</option>
+                    <!-- <option class="sort-option" value="-date_created">Newest</option>
                     <option class="sort-option" value="date_edited">Least Recently Edited</option>
                     <option class="sort-option" value="-date_edited">Most Recently Edited</option>
                     <option class="sort-option" value="date_last_reviewed">Least Recently Reviewed</option>
-                    <option class="sort-option" value="-date_last_reviewed">Most Recently Reviewed</option>
+                    <option class="sort-option" value="-date_last_reviewed">Most Recently Reviewed</option> -->
                 </select>
             </div>
     

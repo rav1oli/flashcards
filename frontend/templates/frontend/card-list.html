@@ -4,6 +4,7 @@
 
 {% block scripts %}
     <script src="{% static 'frontend/cards.js' %}"></script>
+    <script src="{% static 'frontend/forms.js' %}"></script>
 {% endblock %}
 
 {% block body %}
@@ -64,7 +65,10 @@
                     hx-target="body"
                     hx-swap="beforeend"/>
 
-                <img class="icon list-edit-icon list-add-tags-icon hoverable" src="{% static 'frontend/icons/tag.svg' %}" width="40px" height="40px" title="Add Tags to Cards" alt="Add Tags to Cards"/>
+                <img class="icon list-edit-icon list-add-tags-icon hoverable" src="{% static 'frontend/icons/tag.svg' %}" width="40px" height="40px" title="Add Tags to Cards" alt="Add Tags to Cards"
+                    hx-get="{% url 'tag_card_multiple_form' %}"
+                    hx-target="body"
+                    hx-swap="beforeend"/>
             </div>
         </div>
 

@@ -15,6 +15,7 @@ urlpatterns = [
     
 
     path("tag_card_form/<pk>", views.tag_card_form, name="tag_card_form"),
+    path("tag_card_multiple_form", views.tag_card_multiple_form, name="tag_card_multiple_form"),
     path("deck_card_form/<pk>", views.deck_card_form, name="deck_card_form"),
     path("deck_card_multiple_form", views.deck_card_multiple_form, name="deck_card_multiple_form"),
 

@@ -75,7 +75,7 @@ class OrderSelectForm(forms.Form):
     order_by = forms.ChoiceField(choices=ORDER_CHOICES)
 
 
-class TagCheckboxForm(DynamicFormMixin, forms.ModelForm):
+class TagCheckboxModelForm(DynamicFormMixin, forms.ModelForm):
     tags = DynamicField(
         forms.ModelMultipleChoiceField,
         queryset=lambda form: Tag.objects.filter(user=form.context['user']),
@@ -86,6 +86,15 @@ class TagCheckboxForm(DynamicFormMixin, forms.ModelForm):
     class Meta:
         model = Card
         fields = ['tags']
+
+
+class TagCheckboxForm(DynamicFormMixin, forms.Form):
+    tags = DynamicField(
+        forms.ModelMultipleChoiceField,
+        queryset=lambda form: Tag.objects.filter(user=form.context['user']),
+        widget=lambda _: forms.CheckboxSelectMultiple,
+        required=False,
+    )
 
 
 class DeckSelectModelForm(DynamicFormMixin, forms.ModelForm):

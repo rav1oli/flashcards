@@ -113,16 +113,39 @@ def tag_card_form(request, pk):
     card = Card.objects.get(pk=pk)
 
     if request.method == "POST":
-        form = TagCheckboxForm(request.POST, context={'user': request.user}, instance=card)
+        form = TagCheckboxModelForm(request.POST, context={'user': request.user}, instance=card)
         if form.is_valid():
             form.save()
             return HttpResponse("")
         else: 
             return render(request, 'frontend/partials/tag-card-form.html', {'form': form})
     else: 
-        form = TagCheckboxForm(context={'user': request.user}, instance=card)
+        form = TagCheckboxModelForm(context={'user': request.user}, instance=card)
         return render(request, 'frontend/partials/tag-card-form.html', {'form': form})
     
+
+def tag_card_multiple_form(request):
+
+    if request.method == "POST":
+        form = TagCheckboxForm(request.POST, context={'user': request.user})
+        card_ids = request.POST.getlist('card_id')
+        card_ids = [int(id) for id in card_ids]
+        cards = Card.objects.filter(pk__in=card_ids)
+
+        if form.is_valid():
+            tags = form.cleaned_data.get('tags', [])
+            for card in cards:
+                for tag in tags:
+                    card.tags.add(tag)
+
+            return HttpResponse("")
+        else: 
+            return render(request, 'frontend/partials/tag-card-multiple-form.html', {'form': form})
+    
+    else:
+        form = TagCheckboxForm(context={'user': request.user})
+        return render(request, 'frontend/partials/tag-card-multiple-form.html', {'form': form})
+
 
 #identical to tag_card_form but with different form. If i were a better coder I would make a common class or something (but honestly what's the point)
 #I mean django already has the classes but ill be damned if I know how to use them.

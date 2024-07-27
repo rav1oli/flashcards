@@ -1,8 +1,9 @@
 <dialog>
     <form class="grey-form" 
-        hx-post="{% url 'tag_card_form' form.instance.id %}" 
+        hx-post="{% url 'tag_card_multiple_form' %}" 
+        hx-include=".selected"
         hx-target="closest dialog" 
-        hx-swap="outerHTML" >
+        hx-swap="outerHTML">
         {% csrf_token %}
         
         {{ form.as_p }}
@@ -11,6 +12,3 @@
     </form>
 
 </dialog>
-
-
-

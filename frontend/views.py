@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.views.generic.list import ListView
 from django.contrib.auth.forms import UserCreationForm
 from django.urls import reverse_lazy, reverse
-from django.views.generic import CreateView, TemplateView, UpdateView
+from django.views.generic import CreateView, TemplateView, UpdateView, FormView
 from django.http import HttpResponseRedirect, HttpResponse
 from django.forms import inlineformset_factory
 from django_htmx.http import HttpResponseClientRedirect
@@ -11,22 +11,6 @@ from django_htmx.http import HttpResponseClientRedirect
 from .models import *
 from .forms import *
 from .util import *
-
-def get_filtered_and_sorted_user_cards(request, post=False):
-    if post:
-        order_by = request.POST.get('order_by', 'date_created')
-        tag_id = int(request.POST.get('filter', 0))
-    else:
-        order_by = request.GET.get('order_by', 'date_created')
-        tag_id = int(request.GET.get('filter', 0))
-    
-
-    card_list = get_user_cards(request.user)
-
-    if tag_id == 0:
-        return card_list.order_by(order_by)
-    else:
-        return card_list.filter(tags__id=tag_id).order_by(order_by)
 
 # Create your views here.
 class SignUpView(CreateView):
@@ -37,6 +21,7 @@ class SignUpView(CreateView):
 
 class IndexView(TemplateView):
     template_name = "frontend/index.html"
+
 
 
 def card_list_view(request):
@@ -56,6 +41,23 @@ def card_list_view(request):
     card_list = get_filtered_and_sorted_user_cards(request)
 
     return render(request, template_name, {'card_list': card_list})
+
+
+def deck_list_view(request):
+
+    if request.htmx:
+        template_name = 'frontend/partials/decks.html'
+
+        order = request.GET.get('order_by', "date_created")
+        request.session['preselected_order'] = order
+
+    else:
+        template_name = 'frontend/deck-list.html'
+
+    deck_list = get_filtered_and_sorted_user_decks(request)
+
+    return render(request, template_name, {'deck_list': deck_list})
+
 
 
 def tag_select_list(request):
@@ -78,7 +80,8 @@ def order_select_list(request):
     })
 
 
-def create_card_form(request):
+
+def card_create_form(request):
 
     if request.method == "POST":
         form = CardForm(request.POST, context={'user': request.user})
@@ -91,9 +94,10 @@ def create_card_form(request):
     else: 
         form = CardForm(context={'user': request.user})
         return render(request, 'frontend/card-create-form.html', {'form': form})
+    
 
+def card_update_form(request, pk):
 
-def update_card_form(request, pk):
     card = Card.objects.get(pk=pk)
 
     if request.method == "POST":
@@ -109,7 +113,23 @@ def update_card_form(request, pk):
         return render(request, 'frontend/card-create-form.html', {'form': form})
 
 
+def deck_create_form(request):
+
+    if request.method == "POST":
+        form = DeckForm(request.POST, context={'user': request.user})
+        if form.is_valid():
+            form.instance.user = request.user
+            form.save()
+            return HttpResponseRedirect(reverse('create_deck'))
+        else: 
+            return render(request, 'frontend/deck-create-form.html', {'form': form})
+    else: 
+        form = DeckForm(context={'user': request.user})
+        return render(request, 'frontend/deck-create-form.html', {'form': form})
+
+
 def tag_card_form(request, pk):
+
     card = Card.objects.get(pk=pk)
 
     if request.method == "POST":
@@ -118,11 +138,17 @@ def tag_card_form(request, pk):
             form.save()
             return HttpResponse("")
         else: 
-            return render(request, 'frontend/partials/tag-card-form.html', {'form': form})
+            return render(request, 'frontend/modal-forms/tag-card-form.html', {
+                'form': form,
+                'submit_url': reverse_lazy('tag_card_form', args=[form.instance.pk]),
+            })
     else: 
         form = TagCheckboxModelForm(context={'user': request.user}, instance=card)
-        return render(request, 'frontend/partials/tag-card-form.html', {'form': form})
-    
+        return render(request, 'frontend/modal-forms/tag-card-form.html', {
+            'form': form,
+            'submit_url': reverse_lazy('tag_card_form', args=[form.instance.pk]),
+        })
+
 
 def tag_card_multiple_form(request):
 
@@ -140,15 +166,19 @@ def tag_card_multiple_form(request):
 
             return HttpResponse("")
         else: 
-            return render(request, 'frontend/partials/tag-card-multiple-form.html', {'form': form})
+            return render(request, 'frontend/modal-forms/tag-card-form.html', {
+                'form': form,
+                'submit_url': reverse_lazy('tag_card_multiple_form')
+            })
     
     else:
         form = TagCheckboxForm(context={'user': request.user})
-        return render(request, 'frontend/partials/tag-card-multiple-form.html', {'form': form})
-
-
-#identical to tag_card_form but with different form. If i were a better coder I would make a common class or something (but honestly what's the point)
-#I mean django already has the classes but ill be damned if I know how to use them.
+        return render(request, 'frontend/modal-forms/tag-card-form.html', {
+            'form': form,
+            'submit_url': reverse_lazy('tag_card_multiple_form')
+        })
+    
+    
 def deck_card_form(request, pk):
     card = Card.objects.get(pk=pk)
 
@@ -158,12 +188,18 @@ def deck_card_form(request, pk):
             form.save()
             return HttpResponse("")
         else: 
-            return render(request, 'frontend/partials/deck-card-form.html', {'form': form})
+            return render(request, 'frontend/modal-forms/deck-card-form.html', {
+                'form': form,
+                'submit_url': reverse_lazy('deck_card_form', args=[form.instance.pk])
+            })
     
     else:
         form = DeckSelectModelForm(context={'user': request.user}, instance=card)
-        return render(request, 'frontend/partials/deck-card-form.html', {'form': form})
-
+        return render(request, 'frontend/modal-forms/deck-card-form.html', {
+            'form': form,
+            'submit_url': reverse_lazy('deck_card_form', args=[form.instance.pk])
+        })
+    
 
 def deck_card_multiple_form(request):
 
@@ -181,11 +217,33 @@ def deck_card_multiple_form(request):
 
             return HttpResponse("")
         else: 
-            return render(request, 'frontend/partials/deck-card-multiple-form.html', {'form': form})
+            return render(request, 'frontend/modal-forms/deck-card-form.html', {
+                'form': form,
+                'submit_url': reverse_lazy('deck_card_multiple_form')
+            })
     
     else:
         form = DeckSelectForm(context={'user': request.user})
-        return render(request, 'frontend/partials/deck-card-multiple-form.html', {'form': form})
+        return render(request, 'frontend/modal-forms/deck-card-form.html', {
+                'form': form,
+                'submit_url': reverse_lazy('deck_card_multiple_form')
+            })
+
+
+def new_tag_form(request):
+    if request.method == "POST":
+
+        form = NewTagForm(request.POST)
+
+        if form.is_valid():
+            form.instance.user = request.user
+            tag = form.save()
+            
+            return render(request, 'frontend/partials/new-tag-checkbox-option.html', {'tag': tag})
+
+        else:
+            return render(request, 'frontend/modal-forms/new-tag-form.html', {'form': form})
+
 
 
 def delete_card(request, pk):

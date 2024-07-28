@@ -29,7 +29,7 @@
 
         <ul class="navbar">
             <div>
-                <a href=""><li class="nav-button">Deck List</li></a>
+                <a href="{% url 'deck_list' %}"><li class="nav-button">Deck List</li></a>
                 <a href="{% url 'card_list' %}"><li class="nav-button">Card List</li></a>
                 <a href="{% url 'create_card' %}"><li class="nav-button">Create Card</li></a>
             </div>
@@ -43,8 +43,39 @@
                 {% endif %}
             </div>
         </ul>
-
+        
         {% block body %}{% endblock %}
+
+        <dialog id="forms"></section>
+
+        <script>
+            $(function(){
+                const dialog = document.querySelector('dialog');
+                // Listen for the custom event
+                $(document).on('formCreated', function(e, formElement) {
+                    
+                    dialog.showModal();
+
+                    $(formElement).on('submit', function(){
+                        $('.selected').each(function(){
+                            $(this).removeClass('selected');
+                        });
+                        dialog.close();
+                    });
+                    
+                });
+
+                // Use htmx.on to listen for after:swap event
+                htmx.on('htmx:afterSettle', function(evt) {
+                    // Check if the added content contains a form with class 'grey-form'
+                    let addedForm = $(evt.detail.elt).find('.grey-form');
+                    if (addedForm.length > 0) {
+                        // Trigger the custom event
+                        $(document).trigger('formCreated', [addedForm[0]]);
+                    }
+                });
+            });
+        </script>
 
     </body>
 </html>

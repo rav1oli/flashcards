@@ -1,0 +1,24 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block body %}
+    
+    <form action="{% url 'create_deck' %}" method="post" class="deck-form">
+        {% csrf_token %}
+
+        <p>Deck title</p>
+        {{ form.title }}
+
+        <p>Deck description</p>
+        {{ form.description }}
+
+        <p>Cards (ctrl + click to select multiple)</p>
+        {{ form.cards }}
+
+        {% if form.errors %}
+            <p>There was an error with the form. Please try again.</p>
+        {% endif %}
+        <button type="submit" class="form-button">Submit</button>
+    </form>
+
+{% endblock %}

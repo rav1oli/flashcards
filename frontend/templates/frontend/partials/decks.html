@@ -1,0 +1,11 @@
+{% for deck in deck_list %}
+
+    <a href="">
+        <div class="deck item" data-deck-id="{{ deck.id }}">
+            <b>{{ deck.title }}</b>
+            <p>{{ deck.description }}</p>
+            <!-- I'm pretty sure I can do the fanning effect with css -->
+        </div>
+    </a>
+
+{% endfor %}

@@ -2,7 +2,14 @@ from .models import *
 from django import forms
 from dynamic_forms import DynamicField, DynamicFormMixin
 
-class DeckForm(forms.ModelForm):
+class DeckForm(DynamicFormMixin, forms.ModelForm):
+    
+    cards = DynamicField(
+        forms.ModelMultipleChoiceField,
+        queryset=lambda form: Card.objects.filter(user=form.context['user']),
+        widget=lambda _: forms.CheckboxSelectMultiple,
+        required=False,
+    )
 
     class Meta:
         model = Deck
@@ -132,12 +139,19 @@ class DeckSelectModelForm(DynamicFormMixin, forms.ModelForm):
 
 
 class DeckSelectForm(DynamicFormMixin, forms.Form):
+
     decks = DynamicField(
         forms.ModelMultipleChoiceField,
         queryset=lambda form: Deck.objects.filter(user=form.context['user']),
         widget=lambda _: forms.CheckboxSelectMultiple,
         required=False,
     )
+
+
+class NewTagForm(forms.ModelForm):
+    class Meta: 
+        model = Tag
+        fields = ['name']
 
     
 

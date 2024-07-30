@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'frontend',
     "django_htmx",
+    'widget_tweaks',
 ]
 
 MIDDLEWARE = [

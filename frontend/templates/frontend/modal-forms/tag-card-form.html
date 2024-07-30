@@ -4,10 +4,20 @@
     hx-target="this" 
     hx-swap="outerHTML" >
     {% csrf_token %}
-    
-    {{ form.as_p }}
 
-    {% include 'frontend/modal-forms/new-tag-form.html' %}
+    {% for field in form.tags %}
+
+        <div class="tag-checkbox-option">
+            {{ field }}
+            <button type="button" 
+                hx-delete="{% url 'delete_tag' field.data.value %}"
+                hx-target="closest .tag-checkbox-option"
+                hx-swap="outerHTML">Delete</button>
+        </div>
+
+    {% endfor %}
+    
+    {% include 'frontend/modal-forms/tag-create-form.html' %}
 
     <button type="submit" class="form-button close-button">Close</button> <!-- make this a lil x button in the corner -->
 </form>

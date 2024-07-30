@@ -38,9 +38,15 @@ def card_list_view(request):
     else:
         template_name = 'frontend/card-list.html'
 
-    card_list = get_filtered_and_sorted_user_cards(request)
+    card_list = get_filtered_and_sorted_user_cards(request.GET, request.user)
+    context = {'card_list': card_list}
 
-    return render(request, template_name, {'card_list': card_list})
+    deck_id = int(request.GET.get('deck_id', 0))
+    if deck_id != 0:
+        print('deck included')
+        context['deck'] = Deck.objects.get(pk=deck_id)
+
+    return render(request, template_name, context)
 
 
 def deck_list_view(request):
@@ -54,9 +60,23 @@ def deck_list_view(request):
     else:
         template_name = 'frontend/deck-list.html'
 
-    deck_list = get_filtered_and_sorted_user_decks(request)
+    deck_list = get_sorted_user_decks(request.POST, request.user)
 
     return render(request, template_name, {'deck_list': deck_list})
+
+
+def deck_detail_view(request, pk):
+
+    deck = Deck.objects.get(pk=pk)
+    if deck.user != request.user:
+        #add some error screen
+        pass
+
+    template_name = 'frontend/deck-detail.html'
+    return render(request, template_name, {
+        'deck': deck,
+        'card_list': deck.cards.all()
+    })
 
 
 
@@ -126,6 +146,7 @@ def deck_create_form(request):
     else: 
         form = DeckForm(context={'user': request.user})
         return render(request, 'frontend/deck-create-form.html', {'form': form})
+
 
 
 def tag_card_form(request, pk):
@@ -230,20 +251,48 @@ def deck_card_multiple_form(request):
             })
 
 
-def new_tag_form(request):
+def remove_card(request, deck_pk, card_pk):
+
+    deck = Deck.objects.get(pk=deck_pk)
+    deck.cards.remove(card_pk)
+
+    return HttpResponse("")
+
+
+def remove_card_multiple(request, pk):
+
+    deck = Deck.objects.get(request, pk)
+    card_ids = request.GET.getlist()
+    deck.cards.remove(card_ids)
+
+    cards = get_filtered_and_sorted_user_cards(request.POST, request.user)
+
+    return render(request, "frontend/partials/cards.html", {
+        'card_list': cards,
+        'deck': Deck.objects.get(pk=pk)
+    })
+
+
+def tag_create_form(request):
     if request.method == "POST":
 
-        form = NewTagForm(request.POST)
+        form = TagForm(request.POST)
 
         if form.is_valid():
             form.instance.user = request.user
             tag = form.save()
             
-            return render(request, 'frontend/partials/new-tag-checkbox-option.html', {'tag': tag})
+            return render(request, 'frontend/partials/new-tag-option.html', {'tag': tag})
 
         else:
-            return render(request, 'frontend/modal-forms/new-tag-form.html', {'form': form})
+            return render(request, 'frontend/modal-forms/tag-create-form.html', {'form': form})
 
+
+
+def delete_tag(request, pk):
+    Tag.objects.get(pk=pk).delete()
+
+    return HttpResponse("")
 
 
 def delete_card(request, pk):
@@ -253,14 +302,21 @@ def delete_card(request, pk):
         return HttpResponse("")
     
 
-def delete_cards(request):
+def delete_card_multiple(request):
     if request.method == "POST":
 
         card_ids = request.POST.getlist('card_id')
         card_ids = [int(id) for id in card_ids]
         Card.objects.filter(pk__in=card_ids).delete()
 
-        card_list = get_filtered_and_sorted_user_cards(request, True)
+        card_list = get_filtered_and_sorted_user_cards(request.POST, request.user)
+        context = {
+            'card_list': card_list,
+        }
 
-        return render(request, 'frontend/partials/cards.html', {'card_list': card_list})
+        deck_id = int(request.POST.get('deck_id', 0))
+        if deck_id != 0:
+            context['deck'] = Deck.objects.get(pk=deck_id)
+            
+        return render(request, 'frontend/partials/cards.html', context)
     

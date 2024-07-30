@@ -1,0 +1,14 @@
+<div class="tag-checkbox-option">
+
+    <label for="{{ tag.pk }}">
+        <input type="checkbox" name="tags" value="{{ tag.pk }}" id="{{ tag.pk }}" />
+        {{ tag.name }}
+    </label>
+    <button type="button" 
+        hx-delete="{% url 'delete_tag' tag.pk %}"
+        hx-target="closest .tag-checkbox-option"
+        hx-swap="outerHTML">Delete</button>
+
+</div>
+
+{% include 'frontend/modal-forms/tag-create-form.html' %}

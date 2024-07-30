@@ -148,7 +148,7 @@ class DeckSelectForm(DynamicFormMixin, forms.Form):
     )
 
 
-class NewTagForm(forms.ModelForm):
+class TagForm(forms.ModelForm):
     class Meta: 
         model = Tag
         fields = ['name']

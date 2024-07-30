@@ -15,16 +15,16 @@ def get_user_decks(user):
         return Deck.objects.none
 
 
-def get_filtered_and_sorted_user_cards(request, post=False):
-    if post:
-        order_by = request.POST.get('order_by', 'date_created')
-        tag_id = int(request.POST.get('filter', 0))
-    else:
-        order_by = request.GET.get('order_by', 'date_created')
-        tag_id = int(request.GET.get('filter', 0))
-    
+def get_filtered_and_sorted_user_cards(request_data, user):
 
-    card_list = get_user_cards(request.user)
+    order_by = request_data.get('order_by', 'date_created')
+    tag_id = int(request_data.get('filter', 0))
+    deck = request_data.get('deck_id', 0)
+    
+    card_list = get_user_cards(user)
+
+    if deck != 0:
+        card_list = card_list.filter(decks=deck)
 
     if tag_id == 0:
         return card_list.order_by(order_by)
@@ -32,14 +32,10 @@ def get_filtered_and_sorted_user_cards(request, post=False):
         return card_list.filter(tags__id=tag_id).order_by(order_by)
     
 
-def get_filtered_and_sorted_user_decks(request, post=False):
-    if post:
-        order_by = request.POST.get('order_by', 'date_created')
-    else:
-        order_by = request.GET.get('order_by', 'date_created')
+def get_sorted_user_decks(request_data, user):
+    
+    order_by = request_data.get('order_by', 'date_created')
 
-    deck_list = get_user_decks(request.user)
+    deck_list = get_user_decks(user)
 
     return deck_list.order_by(order_by)
-
-

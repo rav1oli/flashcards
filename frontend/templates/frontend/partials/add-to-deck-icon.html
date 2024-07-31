@@ -1,0 +1,6 @@
+{% load static %}
+
+<img class="icon hoverable card-edit-icon card-add-to-deck-icon" src="{% static 'frontend/icons/add.svg' %}" width="25px" height="25px" title="Add Card to Decks" alt="Add Card to Decks"
+    hx-get="{% url 'deck_card_form' pk=card.pk %}"
+    hx-target="#forms"
+    _="on click halt bubbling"/>

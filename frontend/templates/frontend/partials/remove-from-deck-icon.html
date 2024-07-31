@@ -1,0 +1,7 @@
+{% load static %}
+
+<img class="icon hoverable card-edit-icon card-remove-from-deck-icon" src="{% static 'frontend/icons/remove.svg' %}" width="25px" height="25px" title="Add Card to Decks" alt="Add Card to Decks"
+    hx-get="{% url 'remove_card' deck_pk=deck.pk card_pk=card.pk %}"
+    hx-target="closest .card"
+    hx-swap="outerHTML"
+    _="on click halt bubbling"/>

@@ -124,7 +124,8 @@ def card_update_form(request, pk):
         form = CardForm(request.POST, context={'user': request.user}, instance=card)
         if form.is_valid():
             form.save()
-            return HttpResponseRedirect(reverse('card_list'))
+            next = request.POST.get('next', reverse("card_list"))
+            return HttpResponseRedirect(next)
         else: 
             return render(request, 'frontend/card-create-form.html', {'form': form})
     

@@ -8,11 +8,32 @@
         <p class="label label-front">Front: </p>
         <p class="label label-back">Back: </p>
 
-        {% if deck %}
-            {% include 'frontend/partials/deck-list-edit-icons.html' %}
-        {% else %}
-            {% include 'frontend/partials/card-list-edit-icons.html' %}
-        {% endif %}
+        <div class="card-edit-icons">
+
+            <img class="icon hoverable card-edit-icon card-bin-icon" src="{% static 'frontend/icons/bin.svg' %}" width="25px" height="25px" title="Delete Card" alt="Delete Card"
+                hx-delete="{% url 'delete_card' pk=card.id %}"
+                hx-trigger="click"
+                hx-target="closest .card"
+                hx-swap="outerHTML"
+                _="on click halt bubbling"/>
+        
+            <a href="{% url 'update_card' card.pk %}?next={{ request.path|urlencode }}"><img class="icon hoverable card-edit-icon card-pencil-icon" src="{% static 'frontend/icons/pencil.svg' %}" width="25px" height="25px" title="Edit Card" alt="Edit Card"/></a>
+        
+            {% if deck %}
+                {% include 'frontend/partials/remove-from-deck-icon.html' %}
+            {% else %}
+                {% include 'frontend/partials/add-to-deck-icon.html' %}
+            {% endif %}
+        
+            <img class="icon hoverable card-edit-icon card-add-tags-icon" src="{% static 'frontend/icons/tag.svg' %}" width="25px" height="25px" title="Set Tags for Card" alt="Set Tags for Card"
+                hx-get="{% url 'tag_card_form' pk=card.pk %}"
+                hx-target="#forms"
+                _="on click halt bubbling"/>
+                
+        </div>
+        
+            
+        
 
         <img class="icon hoverable flip-icon" src="{% static 'frontend/icons/curve-down-arrow.svg' %}" width="25px" height="25px" title="Flip" alt="Flip" />
 

@@ -20,7 +20,7 @@ function flip(card){
     }, 300);
 }
 
-$(function(){
+$(document).on("htmx:load", function(){
 
     $('.flip-icon').each(function(){
         $(this).on('click', function(e){

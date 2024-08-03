@@ -7,6 +7,7 @@ from django.views.generic import CreateView, TemplateView, UpdateView, FormView
 from django.http import HttpResponseRedirect, HttpResponse
 from django.forms import inlineformset_factory
 from django_htmx.http import HttpResponseClientRedirect
+from django.core.paginator import Paginator
 
 from .models import *
 from .forms import *
@@ -29,12 +30,6 @@ def card_list_view(request):
     if request.htmx:
         template_name = 'frontend/partials/cards.html'
 
-        tag_id = int(request.GET.get('filter', 0))
-        request.session['preselected_tag'] = tag_id
-
-        order = request.GET.get('order_by', "date_created")
-        request.session['preselected_order'] = order
-
     else:
         template_name = 'frontend/card-list.html'
 
@@ -43,7 +38,6 @@ def card_list_view(request):
 
     deck_id = int(request.GET.get('deck_id', 0))
     if deck_id != 0:
-        print('deck included')
         context['deck'] = Deck.objects.get(pk=deck_id)
 
     return render(request, template_name, context)
@@ -81,9 +75,8 @@ def deck_detail_view(request, pk):
 
 
 def tag_select_list(request):
-    preselected_tag = request.session.get('preselected_tag', 0)
 
-    form = TagSelectForm(context={'user': request.user,}, initial={'tags': preselected_tag})
+    form = TagSelectForm(context={'user': request.user,})
 
     return render(request, 'frontend/partials/tag-select-list.html', {
         'form': form,
@@ -91,9 +84,9 @@ def tag_select_list(request):
     
 
 def order_select_list(request):
-    preselected_order = request.session.get('preselected_order', "date_created")
 
-    form = OrderSelectForm(initial={'order_by': preselected_order})
+    initial = request.GET.get('order_by', 'date_created')
+    form = OrderSelectForm(initial={'order_by': initial})
 
     return render(request, 'frontend/partials/order-select-list.html', {
         'form': form,
@@ -108,11 +101,20 @@ def card_create_form(request):
         if form.is_valid():
             form.instance.user = request.user
             form.save()
-            return HttpResponseRedirect(reverse('create_card'))
+            next = request.POST.get('next', reverse("create_card"))
+            if next == "":
+                next = reverse("create_card")
+            return HttpResponseRedirect(next)
         else: 
             return render(request, 'frontend/card-create-form.html', {'form': form})
     else: 
-        form = CardForm(context={'user': request.user})
+
+        if request.GET.get('deck'):
+            initial_deck = Deck.objects.get(pk=request.GET.get('deck'))
+        else:
+            initial_deck=None
+        
+        form = CardForm(context={'user': request.user}, initial_deck=initial_deck)
         return render(request, 'frontend/card-create-form.html', {'form': form})
     
 
@@ -125,6 +127,8 @@ def card_update_form(request, pk):
         if form.is_valid():
             form.save()
             next = request.POST.get('next', reverse("card_list"))
+            if next == "":
+                next = reverse("card_list")
             return HttpResponseRedirect(next)
         else: 
             return render(request, 'frontend/card-create-form.html', {'form': form})
@@ -141,7 +145,7 @@ def deck_create_form(request):
         if form.is_valid():
             form.instance.user = request.user
             form.save()
-            return HttpResponseRedirect(reverse('create_deck'))
+            return HttpResponseRedirect(reverse('deck_list'))
         else: 
             return render(request, 'frontend/deck-create-form.html', {'form': form})
     else: 
@@ -306,18 +310,83 @@ def delete_card(request, pk):
 def delete_card_multiple(request):
     if request.method == "POST":
 
+        filter = request.POST.get('filter', 0)
+        order_by = request.POST.get('order_by', 'date_created')
+
         card_ids = request.POST.getlist('card_id')
         card_ids = [int(id) for id in card_ids]
         Card.objects.filter(pk__in=card_ids).delete()
 
-        card_list = get_filtered_and_sorted_user_cards(request.POST, request.user)
-        context = {
-            'card_list': card_list,
-        }
+        return HttpResponseRedirect(reverse('card_list') + encode_params(request.POST))
 
-        deck_id = int(request.POST.get('deck_id', 0))
-        if deck_id != 0:
-            context['deck'] = Deck.objects.get(pk=deck_id)
-            
-        return render(request, 'frontend/partials/cards.html', context)
+
+
+def deck_study(request, pk):
+    cards = Card.objects.filter(decks__id=pk).order_by('date_created')
+    p = Paginator(cards, 1)
+
+    if request.htmx:
+        template_name = 'frontend/partials/card-container.html' 
+    else:
+        template_name = 'frontend/deck-study.html'
+
+    blank_history = {'results': {}, 'furthest': 1, 'current': 1}
+
+    if request.method == "POST":
+        
+        history = request.session['deck_study_session']
+        #save results
+        for page_num, confidence in history['results'].items():
+            update_card_review_time(cards[int(page_num) - 1], confidence)
+
+        return HttpResponseClientRedirect(reverse('deck_detail', args=[pk]))
     
+    else:
+        
+
+        #if navigated to via study button:
+        if request.GET.get('new', False):
+            history = blank_history
+            request.session['deck_study_session'] = history #initialise deck_study_session obj
+            page_num = 1
+            page_obj = p.page(page_num)
+
+        #if form changes, update history
+        elif request.GET.get("change"):
+            history = request.session.get('deck_study_session', blank_history)
+            page_num = int(history['current'])
+
+            history['results'][page_num] = request.GET.get('confidence', "dont_know")
+            request.session['deck_study_session'] = history
+
+        #navigated via arrows
+        else:  
+            page_num = int(request.GET.get('page', 1))
+            history = request.session.get('deck_study_session', blank_history)
+            history['current'] = page_num
+            if page_num > history['furthest']:
+                history['furthest'] = page_num
+
+            request.session['deck_study_session'] = history
+
+        page_obj = p.page(page_num)
+        card = page_obj[0]
+        result = history['results'].get(str(page_num), None)
+        if result:
+            form = ConfidenceForm(initial={'confidence': result})
+            has_results = True
+        else:
+            form = ConfidenceForm()
+            has_results = False
+
+        has_next = "True" if history['furthest'] > page_num else "False"
+
+        return render(request, template_name, {
+            'deck': Deck.objects.get(pk=pk),
+            'page_obj': page_obj,
+            'card': card,
+            'result_times': calculate_result_times(card),
+            'form': form,
+            'has_results': has_results,
+            'has_next': has_next,
+        })

@@ -67,7 +67,7 @@
         </div>
 
         <div class="deck-options">
-            <button class="btn study-btn form-button">Study</button>
+            <a href="{% url 'deck_study' deck.pk %}?new=True"><button class="btn study-btn form-button">Study</button></a>
             <button class="btn play-btn form-button">Play</button>
         </div>
 
@@ -75,16 +75,18 @@
         
             <section id="cards-in-card-list" class="container">{% include 'frontend/partials/cards.html' %}</section>
 
-            <div class="item create-card add-card last">
-                    
-                <div class="card-front">
-                    <div class="wrapper">
-                        <img src="{% static 'frontend/icons/add.svg' %}" width="60px" height="60px" style="opacity: 0.7"/>
-                        <p>Add Cards To Deck</p>
+            <a href="{% url 'create_card' %}?next={{ request.path|urlencode }}&deck={{ deck.id }}" class="last">
+                <div class="item create-card">
+                        
+                    <div class="card-front">
+                        <div class="wrapper">
+                            <img src="{% static 'frontend/icons/plus.svg' %}" width="40px" height="40px"/>
+                            <p>Create New Card</p>
+                        </div>
                     </div>
+                    
                 </div>
-                
-            </div>
+            </a>
         
         </div>
 

@@ -1,5 +1,16 @@
 from .models import *
 
+#CONFIDENCE_MATRIX[box][confidence (0 is confident, 4 is dont_know)] will give you the new box.
+CONFIDENCE_MATRIX = [
+    [2, 1, 0, 0],
+    [3, 2, 0, 0],
+    [4, 3, 1, 0],
+    [4, 4, 2, 0],
+    [5, 4, 2, 0],
+    [6, 4, 2, 0],
+    [6, 5, 2, 0],
+]
+
 
 def get_user_cards(user):
     if user.is_authenticated:
@@ -39,3 +50,36 @@ def get_sorted_user_decks(request_data, user):
     deck_list = get_user_decks(user)
 
     return deck_list.order_by(order_by)
+
+
+def calculate_result_times(card):
+    
+    boxes = ["Again", "Tomorrow", "2 days", "4 days", "1 week", "2 weeks", "1 month"]
+    
+    box = card.review_interval_box
+
+    return [boxes[idx] for idx in CONFIDENCE_MATRIX[box]]
+
+
+def update_card_review_time(card, confidence):
+    box = card.review_interval_box
+
+    if confidence == "confident":
+        new_box = CONFIDENCE_MATRIX[box][0]
+
+    elif confidence == "good":
+        new_box = CONFIDENCE_MATRIX[box][1]
+
+    elif confidence == "unsure":
+        new_box = CONFIDENCE_MATRIX[box][2]
+    
+    else:
+        new_box = CONFIDENCE_MATRIX[box][3]
+
+    card.review_interval_box = new_box
+    card.save()
+    return
+
+
+def encode_params(data):
+    return f"?filter={data.get('filter', '0')}&order_by={data.get('order_by', 'date_created')}&deck={data.get('deck', '0')}"

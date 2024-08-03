@@ -38,10 +38,13 @@ class CardForm(DynamicFormMixin, forms.ModelForm):
 
 
     def __init__(self, *args, **kwargs):
+        deck = kwargs.pop('initial_deck', None)
         super().__init__(*args, **kwargs)
         if self.instance.pk:
             initial_decks = self.instance.decks.all()
             self.fields['decks'].initial = initial_decks
+        elif deck:
+            self.fields['decks'].initial = deck
 
 
     def save(self, commit=True):
@@ -154,5 +157,17 @@ class TagForm(forms.ModelForm):
         fields = ['name']
 
     
+class ConfidenceForm(forms.Form):
 
+    CONFIDENCE_CHOICES = [
+        ("confident", "Confident"),
+        ("good", "Good"),
+        ("unsure", "Unsure"),
+        ("dont_know", "Don't Know"),
+    ]
+
+    confidence = forms.MultipleChoiceField(
+        choices=CONFIDENCE_CHOICES,
+        widget=forms.RadioSelect
+    )
     

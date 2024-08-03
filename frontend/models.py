@@ -13,6 +13,23 @@ class Tag(models.Model):
 
 
 class Card(models.Model):
+    '''
+    First number is the box, 2nd number is the when next review should occur.
+     - Confident increases box num by 2 up to box.
+     - Good increases box num by 1 until 1 week.
+     - Unsure decreases box num by 1, after 1 week decrease by 2.
+     - Don't Know brings back to box 0.
+    '''
+    REVIEW_INTERVAL_CHOICES = [
+        (0, "Again"),
+        (1, "Tomorrow"),
+        (2, "2 days"),
+        (3, "4 days"),
+        (4, "1 week"),
+        (6, "2 weeks"),
+        (7, "1 month"),
+    ]
+
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     front = models.TextField()
     back = models.TextField()
@@ -21,7 +38,7 @@ class Card(models.Model):
     date_edited = models.DateTimeField(auto_now=True)
     date_last_reviewed = models.DateTimeField(auto_now_add=True)
     tags = models.ManyToManyField(Tag, blank=True, related_name="cards")
-    #add option for file upload later
+    review_interval_box = models.PositiveSmallIntegerField(choices=REVIEW_INTERVAL_CHOICES, default=0)
 
     def __str__(self):
         return self.front

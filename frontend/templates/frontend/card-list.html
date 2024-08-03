@@ -21,7 +21,7 @@
                     hx-push-url="true">
 
                     <option id="all-cards-tag" class="filter-tag" value="0" 
-                        hx-get="{% url 'tag_select_list' %}" 
+                        hx-get="{% url 'tag_select_list' %}?{{ request.GET.urlencode }}" 
                         hx-trigger="load" 
                         hx-target="this"
                         hx-swap="afterend"
@@ -39,7 +39,7 @@
                     hx-push-url="true">
 
                     <option class="order-option" value="date_created"
-                        hx-get="{% url 'order_select_list' %}" 
+                        hx-get="{% url 'order_select_list' %}?{{ request.GET.urlencode }}" 
                         hx-trigger="load" 
                         hx-target="this"
                         hx-swap="outerHTML"

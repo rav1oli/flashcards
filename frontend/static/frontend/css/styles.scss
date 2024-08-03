@@ -397,3 +397,24 @@ hr {
         margin: 10px;
     }
 }
+
+
+.deck-study {
+    display: grid;
+    height: 90vh;
+    width: 100vw;
+    grid-template-rows: 1fr 4fr 1fr;
+    grid-template-columns: 1fr;
+}
+
+.deck-study-footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 150px;
+}
+
+.grey {
+    opacity: 0.2;
+    pointer-events: none;
+}

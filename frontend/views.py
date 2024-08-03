@@ -27,7 +27,7 @@ def index_view(request):
             'decks': get_sorted_user_decks(request.GET, request.user)
         }
 
-    return render(request, 'index.html', context)
+    return render(request, 'frontend/index.html', context)
 
 def card_list_view(request):
 
@@ -318,7 +318,7 @@ def delete_card_multiple(request):
 
 
 
-def deck_study(request, pk):
+def deck_studykajsdkajsdkajs(request, pk):
     cards = Card.objects.filter(decks__id=pk).order_by('date_created')
     p = Paginator(cards, 1)
 
@@ -387,3 +387,22 @@ def deck_study(request, pk):
             'has_results': has_results,
             'has_next': has_next,
         })
+
+
+def deck_study(request, pk):
+    cards = Card.objects.filter(decks__id=pk).order_by('date_created')
+    p = Paginator(cards, 1)
+
+    if request.htmx:
+        template_name = 'frontend/partials/study-card-container.html' 
+    else:
+        template_name = 'frontend/deck-study.html'
+
+    page_number = request.GET.get("page", 0)
+    page_obj = p.get_page(page_number)
+
+    return render(request, template_name, {
+        'deck': Deck.objects.get(pk=pk),
+        'page_obj': page_obj,
+        'card': page_obj[0],
+    })

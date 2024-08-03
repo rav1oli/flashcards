@@ -4,7 +4,7 @@ from . import views
 urlpatterns = [
     path('accounts/signup/', views.SignUpView.as_view(), name="signup"),
 
-    path("", views.IndexView.as_view(), name="index"),
+    path("", views.index_view, name="index"),
     #path("cards", views.CardListTemplateView.as_view(), name="cards"),
     path("create_card", views.card_create_form, name="create_card"),
     path("update_card/<pk>", views.card_update_form, name="update_card"),
@@ -22,7 +22,7 @@ urlpatterns = [
     path("add_cards_to_deck/<pk>", views.deck_card_form, name="deck_card_form"),
     path("add_cards_to_decks", views.deck_card_multiple_form, name="deck_card_multiple_form"),
     path("remove_card_from_deck/<int:deck_pk>/<int:card_pk>", views.remove_card, name="remove_card"),
-    path("remove_cards_from_decks", views.remove_card_multiple, name="remove_card_multiple"),
+    path("remove_cards_from_decks/<int:pk>", views.remove_card_multiple, name="remove_card_multiple"),
     path("create_tag", views.tag_create_form, name="tag_create_form"),
     path("delete_tag/<pk>", views.delete_tag, name="delete_tag"),
 

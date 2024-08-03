@@ -20,10 +20,14 @@ class SignUpView(CreateView):
     template_name = "registration/signup.html"
 
 
-class IndexView(TemplateView):
-    template_name = "frontend/index.html"
+def index_view(request):
+    context = {}
+    if request.user.is_authenticated:
+        context = {
+            'decks': get_sorted_user_decks(request.GET, request.user)
+        }
 
-
+    return render(request, 'index.html', context)
 
 def card_list_view(request):
 
@@ -36,7 +40,7 @@ def card_list_view(request):
     card_list = get_filtered_and_sorted_user_cards(request.GET, request.user)
     context = {'card_list': card_list}
 
-    deck_id = int(request.GET.get('deck_id', 0))
+    deck_id = int(request.GET.get('deck', 0))
     if deck_id != 0:
         context['deck'] = Deck.objects.get(pk=deck_id)
 
@@ -266,16 +270,12 @@ def remove_card(request, deck_pk, card_pk):
 
 def remove_card_multiple(request, pk):
 
-    deck = Deck.objects.get(request, pk)
-    card_ids = request.GET.getlist()
-    deck.cards.remove(card_ids)
+    deck = Deck.objects.get(pk=pk)
+    card_ids = request.POST.getlist('card_id')
+    for id in card_ids:
+        deck.cards.remove(id)
 
-    cards = get_filtered_and_sorted_user_cards(request.POST, request.user)
-
-    return render(request, "frontend/partials/cards.html", {
-        'card_list': cards,
-        'deck': Deck.objects.get(pk=pk)
-    })
+    return HttpResponseRedirect(reverse('card_list') + encode_params(request.POST))
 
 
 def tag_create_form(request):
@@ -309,9 +309,6 @@ def delete_card(request, pk):
 
 def delete_card_multiple(request):
     if request.method == "POST":
-
-        filter = request.POST.get('filter', 0)
-        order_by = request.POST.get('order_by', 'date_created')
 
         card_ids = request.POST.getlist('card_id')
         card_ids = [int(id) for id in card_ids]

@@ -12,7 +12,7 @@
 
         <div class="list-modifiers">
             <div class="left-list-modifiers">
-                <input type="hidden" name="deck_id" value="{{ deck.pk }}" />
+                <input type="hidden" name="deck" value="{{ deck.pk }}" />
 
                 <p>Filter By Tag: </p>
                 <select name="filter" class="filter-select" 
@@ -53,9 +53,10 @@
     
             <div class="list-edit-icons">
                 <img class="icon list-edit-icon list-remove-icon hoverable" src="{% static 'frontend/icons/remove.svg' %}" width="40px" height="40px" title="Remove Cards from Deck" alt="Remove Cards from Deck"
-                    hx-post="{% url 'remove_card_multiple' %}"
-                    hx-include=".selected .left-list-modifiers"
-                    />     
+                    hx-post="{% url 'remove_card_multiple' deck.id %}"
+                    hx-include=".selected, .left-list-modifiers"
+                    hx-target="#cards-in-card-list"/>    
+
                 <img class="icon list-edit-icon list-add-to-deck-icon hoverable" src="{% static 'frontend/icons/add.svg' %}" width="40px" height="40px" title="Add Cards To Decks" alt="Add Cards To Decks"/>
                 <img class="icon list-edit-icon list-add-tags-icon hoverable" src="{% static 'frontend/icons/tag.svg' %}" width="40px" height="40px" title="Add Tags to Cards" alt="Add Tags to Cards"/>
             </div>

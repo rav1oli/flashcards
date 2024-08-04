@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+{% load static %}
+{% load markdown_filter %}
+
+{% block scripts %}
+    <script src="{% static 'frontend/cards.js' %}"></script>
+{% endblock %}
+
+{% block body %}
+
+    <main class="deck-review">
+
+        <div class="deck-review-title">{{ deck.title }}</div>
+
+        <button type="button" class="form-button" hx-post="{% url 'deck_review' deck.id %}">Save and return</button>
+
+        {% include 'frontend/partials/review-card-container.html' %}
+
+    </main>
+
+{% endblock %}

@@ -1,4 +1,5 @@
 from .models import *
+from datetime import date
 
 #CONFIDENCE_MATRIX[box][confidence (0 is confident, 4 is dont_know)] will give you the new box.
 CONFIDENCE_MATRIX = [
@@ -8,7 +9,7 @@ CONFIDENCE_MATRIX = [
     [4, 4, 2, 0],
     [5, 4, 2, 0],
     [6, 4, 2, 0],
-    [6, 5, 2, 0],
+    [6, 4, 2, 0],
 ]
 
 
@@ -30,12 +31,12 @@ def get_filtered_and_sorted_user_cards(request_data, user):
 
     order_by = request_data.get('order_by', 'date_created')
     tag_id = int(request_data.get('filter', 0))
-    deck = request_data.get('deck', 0)
+    deck_id = int(request_data.get('deck', 0))
     
     card_list = get_user_cards(user)
 
-    if deck != 0:
-        card_list = card_list.filter(decks=deck)
+    if deck_id != 0:
+        card_list = card_list.filter(decks__id=deck_id)
 
     if tag_id == 0:
         return card_list.order_by(order_by)
@@ -83,3 +84,7 @@ def update_card_review_time(card, confidence):
 
 def encode_params(data):
     return f"?filter={data.get('filter', '0')}&order_by={data.get('order_by', 'date_created')}&deck={data.get('deck', '0')}"
+
+
+def get_deck_review_cards(pk):
+    return [card for card in Card.objects.filter(decks__id=pk) if date.today() >= card.get_review_date()]

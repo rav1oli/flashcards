@@ -5,7 +5,6 @@ from django.contrib.auth.forms import UserCreationForm
 from django.urls import reverse_lazy, reverse
 from django.views.generic import CreateView, TemplateView, UpdateView, FormView
 from django.http import HttpResponseRedirect, HttpResponse
-from django.forms import inlineformset_factory
 from django_htmx.http import HttpResponseClientRedirect
 from django.core.paginator import Paginator
 
@@ -21,13 +20,17 @@ class SignUpView(CreateView):
 
 
 def index_view(request):
-    context = {}
-    if request.user.is_authenticated:
-        context = {
-            'decks': get_sorted_user_decks(request.GET, request.user)
-        }
+    decks = Deck.objects.all()
+    l = []
+    for deck in decks:
+        cards = get_deck_review_cards(deck.pk)
+        deck_obj = {'deck': deck, 'cards': len(cards)}
+        l.append(deck_obj)
 
-    return render(request, 'frontend/index.html', context)
+    return render(request, 'frontend/index.html', {
+        'l': l
+    })
+
 
 def card_list_view(request):
 
@@ -318,7 +321,7 @@ def delete_card_multiple(request):
 
 
 
-def deck_studykajsdkajsdkajs(request, pk):
+def deck_studyaksjdaksjdbas(request, pk):
     cards = Card.objects.filter(decks__id=pk).order_by('date_created')
     p = Paginator(cards, 1)
 
@@ -389,6 +392,50 @@ def deck_studykajsdkajsdkajs(request, pk):
         })
 
 
+def deck_review(request, pk):
+    deck = Deck.objects.get(pk=pk)
+    page_num = request.GET.get("page", 1)
+
+    if request.GET.get('new', False):
+        cards = get_deck_review_cards(pk)
+        request.session['deck_review_session'] = {
+            'card_ids': [card.id for card in cards],
+        }
+    
+    else:
+        session = request.session.get('deck_review_session', {})
+        cards = Card.objects.filter(pk__in=session.get('card_ids', [])).order_by('date_created')
+        
+    p = Paginator(cards, 1)
+        
+    page_obj = p.get_page(page_num)
+
+    if request.method == "POST":
+        card = Card.objects.get(pk=request.POST.get('card_id'))
+        confidence = request.POST.get('confidence', 'dont_know')
+        
+        update_card_review_time(card, confidence)
+
+        page_num = int(request.POST.get('page_num', 1))
+        if page_num < p.count:
+            return HttpResponseRedirect(reverse('deck_review', args=[deck.id]) + '?page=' + str(page_num + 1))
+        else:
+            return HttpResponseClientRedirect(reverse('index'))
+
+    if request.htmx:
+        template_name = 'frontend/partials/review-card-container.html' 
+    else:
+        template_name = 'frontend/deck-review.html'
+
+    return render(request, template_name, {
+        'deck': Deck.objects.get(pk=pk),
+        'page_obj': page_obj,
+        'card': page_obj[0],
+        'result_times': calculate_result_times(page_obj[0]),
+        'form': ConfidenceForm(),
+    })
+
+
 def deck_study(request, pk):
     cards = Card.objects.filter(decks__id=pk).order_by('date_created')
     p = Paginator(cards, 1)
@@ -398,7 +445,7 @@ def deck_study(request, pk):
     else:
         template_name = 'frontend/deck-study.html'
 
-    page_number = request.GET.get("page", 0)
+    page_number = request.GET.get("page", 1)
     page_obj = p.get_page(page_number)
 
     return render(request, template_name, {
@@ -406,3 +453,7 @@ def deck_study(request, pk):
         'page_obj': page_obj,
         'card': page_obj[0],
     })
+
+
+def deck_learn(request, pk):
+    

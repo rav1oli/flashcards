@@ -3,6 +3,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django import forms
+from datetime import timedelta
 
 class Tag(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -30,6 +31,9 @@ class Card(models.Model):
         (7, "1 month"),
     ]
 
+    #time intervals corresponding with each box.
+    TIME_INTERVALS = [timedelta(0), timedelta(days=1), timedelta(days=2), timedelta(days=4), timedelta(days=7), timedelta(days=14), timedelta(days=30)]
+
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     front = models.TextField()
     back = models.TextField()
@@ -42,6 +46,10 @@ class Card(models.Model):
 
     def __str__(self):
         return self.front
+
+    def get_review_date(self):
+        return self.date_last_reviewed.date() + self.TIME_INTERVALS[self.review_interval_box]
+        
 
 
 class Deck(models.Model):

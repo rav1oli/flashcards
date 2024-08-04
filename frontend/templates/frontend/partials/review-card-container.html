@@ -1,0 +1,54 @@
+{% load static %}
+{% load markdown_filter %}
+{% load index_filter %}
+
+<div class="deck-study-card-container">
+
+    <div>Progress Bar</div>
+
+    <span class="current">
+        Card {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+    </span>
+    
+    <div class="deck-study-card">
+        <div class="card item">
+            <input type="hidden" name="card_id" value="{{ card.pk }}" />
+        
+            <p class="label label-front">Front: </p>
+            <p class="label label-back">Back: </p>
+        
+            <img class="icon hoverable flip-icon" src="{% static 'frontend/icons/curve-down-arrow.svg' %}" width="50px" height="50px" title="Flip" alt="Flip" 
+                _="on click remove .grey from .deck-study-footer"/>
+        
+            <div class="card-front">
+                {{ card.front|markdownify|safe }}
+            </div>
+            <div class="card-back">
+                {{ card.back|markdownify|safe }}
+            </div>
+        
+        </div>
+    </div>
+
+    <form class="deck-study-footer grey"
+        hx-post="{% url 'deck_review' deck.id %}"
+        hx-trigger="change"
+        hx-swap="outerHTML"
+        hx-target=".deck-study-card-container"
+        hx-push-url="true">
+
+        <input type="hidden" name="card_id" value="{{ card.id }}" />
+        <input type="hidden" name="page_num" value="{{ page_obj.number }}" />
+
+        {% for radio in form.confidence %}
+            <div class="radio">
+            {{ radio.tag }}
+            <label for="{{ radio.id_for_label }}">
+                {{ radio.choice_label }} ({{ result_times|index:forloop.counter0 }})
+              </label>
+            </div>
+        {% endfor %}
+
+    </form>
+
+</div>

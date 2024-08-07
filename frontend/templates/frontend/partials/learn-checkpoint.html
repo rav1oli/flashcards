@@ -1,0 +1,13 @@
+
+{% load static %}
+
+<div class="deck-study-card-container">
+
+    <p>Review the questions you missed: </p>
+    <button 
+        hx-get="{% url 'deck_learn' deck.id %}"
+        hx-swap="outerHTML"
+        hx-target=".deck-study-card-container"
+        hx-push-url="true">>Review</button>
+
+</div>

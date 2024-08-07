@@ -8,25 +8,27 @@
         <div class="list-modifiers">
             <div class="left-list-modifiers">
                 
-                <p>Sort By:</p>
-                <select name="order_by" class="order-select" 
-                    hx-get="{% url 'deck_list' %}" 
-                    hx-trigger="change" 
-                    hx-target="#decks-in-deck-list"
-                    hx-push-url="true">
-
-                    <option class="order-option" value="date_created"
-                        hx-get="{% url 'order_select_list' %}" 
-                        hx-trigger="load" 
-                        hx-target="this"
-                        hx-swap="outerHTML"
-                        hx-push-url="false">Oldest</option>
-                    <!-- <option value="-date_created">Newest</option>
-                    <option value="date_edited">Least Recently Edited</option>
-                    <option value="-date_edited">Most Recently Edited</option>
-                    <option value="date_last_reviewed">Least Recently Reviewed</option>
-                    <option value="-date_last_reviewed">Most Recently Reviewed</option> -->
-                </select>
+                <div>
+                    <p>Sort By:</p>
+                    <select name="order_by" class="order-select" 
+                        hx-get="{% url 'deck_list' %}" 
+                        hx-trigger="change" 
+                        hx-target="#decks-in-deck-list"
+                        hx-push-url="true">
+    
+                        <option class="order-option" value="date_created"
+                            hx-get="{% url 'order_select_list' %}" 
+                            hx-trigger="load" 
+                            hx-target="this"
+                            hx-swap="outerHTML"
+                            hx-push-url="false">Oldest</option>
+                        <!-- <option value="-date_created">Newest</option>
+                        <option value="date_edited">Least Recently Edited</option>
+                        <option value="-date_edited">Most Recently Edited</option>
+                        <option value="date_last_reviewed">Least Recently Reviewed</option>
+                        <option value="-date_last_reviewed">Most Recently Reviewed</option> -->
+                    </select>
+                </div>
             </div>
         </div>
 

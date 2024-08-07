@@ -456,4 +456,60 @@ def deck_study(request, pk):
 
 
 def deck_learn(request, pk):
-    
+    deck = Deck.objects.get(pk=pk)
+    page_num = request.GET.get("page", 1)
+
+    if request.GET.get('new', False):
+        incorrect = [] # list of card_ids they got wrong
+        cards = deck.cards.all().order_by('date_created')
+        request.session['deck_learn_session'] = {
+            'incorrect': incorrect,
+            'cards': [card.id for card in cards],
+        }   
+
+    else:
+        session = request.session.get('deck_learn_session', {})
+        incorrect = session.get('incorrect', [])
+        cards = Card.objects.filter(id__in=request.session['deck_learn_session']['cards']).order_by('date_created')
+        
+    p = Paginator(cards, 1)
+        
+    page_obj = p.get_page(page_num)
+
+    if request.method == "POST":
+        card_id = request.POST.get('card_id')
+        response = request.POST.get('response', 'incorrect') # response is 'correct' or 'incorrect'
+
+        if response == 'incorrect':
+            incorrect.append(card_id)
+            session = request.session['deck_learn_session']
+            session['incorrect'] = incorrect
+            request.session['deck_learn_session'] = session
+
+        page_num = int(request.POST.get('page_num', 1))
+
+        if page_num < p.count:
+            return HttpResponseRedirect(reverse('deck_learn', args=[deck.id]) + '?page=' + str(page_num + 1))
+        else:
+            if len(incorrect) > 0:
+                request.session['deck_learn_session'] = {
+                    'incorrect': [],
+                    'cards': incorrect,
+                }
+                return render(request, 'frontend/partials/learn-checkpoint.html', {
+                    'deck': deck,
+                })
+            else:
+                return HttpResponseClientRedirect(reverse('deck_detail', args=[deck.id]))
+
+    if request.htmx:
+        template_name = 'frontend/partials/learn-card-container.html' 
+    else:
+        template_name = 'frontend/deck-learn.html' # same template as review (for now)
+
+    return render(request, template_name, {
+        'deck': Deck.objects.get(pk=pk),
+        'page_obj': page_obj,
+        'card': page_obj[0],
+        'incorrect_num': len(incorrect),
+    })

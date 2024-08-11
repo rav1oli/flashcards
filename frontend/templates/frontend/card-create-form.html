@@ -1,6 +1,7 @@
 {% extends "layout.html" %}
 {% load static %}
 {% load markdown_filter %}
+{% load crispy_forms_tags %}
 
 {% block scripts %}
     <script src="{% static 'frontend/cards.js' %}"></script>
@@ -8,8 +9,8 @@
 
 {% block body %}
 
-    <form method="post">{% csrf_token %}
-        {{ form.as_p }}
+    <form method="post" class="container mx-auto my-8">{% csrf_token %}
+        {% crispy form %}
 
         <input type="hidden" name="next" value="{{ request.GET.next }}">
         <input type="submit" value="Save">

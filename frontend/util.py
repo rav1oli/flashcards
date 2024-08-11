@@ -49,6 +49,7 @@ def get_sorted_user_decks(request_data, user):
     order_by = request_data.get('order_by', 'date_created')
 
     deck_list = get_user_decks(user)
+    print(order_by)
 
     return deck_list.order_by(order_by)
 

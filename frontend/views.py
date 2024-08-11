@@ -21,14 +21,14 @@ class SignUpView(CreateView):
 
 def index_view(request):
     decks = Deck.objects.all()
-    l = []
+    deck_list = []
     for deck in decks:
         cards = get_deck_review_cards(deck.pk)
         deck_obj = {'deck': deck, 'cards': len(cards)}
-        l.append(deck_obj)
+        deck_list.append(deck_obj)
 
     return render(request, 'frontend/index.html', {
-        'l': l
+        'deck_list': deck_list
     })
 
 
@@ -38,7 +38,7 @@ def card_list_view(request):
         template_name = 'frontend/partials/cards.html'
 
     else:
-        template_name = 'frontend/card-list.html'
+        template_name = 'frontend/list.html'
 
     card_list = get_filtered_and_sorted_user_cards(request.GET, request.user)
     context = {'card_list': card_list}
@@ -55,13 +55,10 @@ def deck_list_view(request):
     if request.htmx:
         template_name = 'frontend/partials/decks.html'
 
-        order = request.GET.get('order_by', "date_created")
-        request.session['preselected_order'] = order
-
     else:
-        template_name = 'frontend/deck-list.html'
+        template_name = 'frontend/list.html'
 
-    deck_list = get_sorted_user_decks(request.POST, request.user)
+    deck_list = get_sorted_user_decks(request.GET, request.user)
 
     return render(request, template_name, {'deck_list': deck_list})
 
@@ -83,7 +80,7 @@ def deck_detail_view(request, pk):
 
 def tag_select_list(request):
 
-    form = TagSelectForm(context={'user': request.user,})
+    form = TagSelectForm(context={'user': request.user})
 
     return render(request, 'frontend/partials/tag-select-list.html', {
         'form': form,
@@ -513,3 +510,7 @@ def deck_learn(request, pk):
         'card': page_obj[0],
         'incorrect_num': len(incorrect),
     })
+
+
+def delete(request):
+    return HttpResponse(status=201)

@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.selected {
+    transform: translateY(-6px);
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
+}
+  
+.selected .edit-icons {
+    display: flex;
+}
+
+.front-label {display: block;}
+.back-label {display: none;}
+
+.flipped .back-label {display: block;}
+.flipped .front-label {display: none;}
+
+.card-front {display: grid;}
+.card-back {display: none;}
+
+.flipped .card-back {display: grid;}
+.flipped .card-front {display: none;}
+
+.list:has(.selected) .list-edit-icons {display: flex;}

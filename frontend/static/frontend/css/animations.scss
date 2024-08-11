@@ -11,3 +11,18 @@
     animation: flip 0.3s;
 }
 
+.card-front, .label-front {
+    display: grid;
+}
+.card-back, .label-back {
+    display: none;
+}
+
+.card.flipped {
+    .card-front, .label-front {
+        display: none;
+    }
+    .card-back, .label-back {
+        display: grid;
+    }
+}

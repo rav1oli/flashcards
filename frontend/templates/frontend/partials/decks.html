@@ -1,9 +1,12 @@
+{% load static %}
+{% load markdown_filter %}
+
 {% for deck in deck_list %}
 
-    <a href="{% url 'deck_detail' deck.pk %}">
-        <div class="deck item" data-deck-id="{{ deck.pk }}">
-            <b>{{ deck.title }}</b>
-            <p>{{ deck.description }}</p>
+    <a href="{% url 'deck_detail' deck.pk %}" class="contents">
+        <div class="deck shadow-md p-6 h-80 bg-offwhite-light" data-deck-id="{{ deck.pk }}">
+            <b class="text-3xl">{{ deck.title }}</b>
+            <p class="text-xl">{{ deck.description }}</p>
             <!-- I'm pretty sure I can do the fanning effect with css -->
         </div>
     </a>

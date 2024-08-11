@@ -8,4 +8,19 @@
 }
 .flipping {
   animation: flip 0.3s;
+}
+
+.card-front, .label-front {
+  display: grid;
+}
+
+.card-back, .label-back {
+  display: none;
+}
+
+.card.flipped .card-front, .card.flipped .label-front {
+  display: none;
+}
+.card.flipped .card-back, .card.flipped .label-back {
+  display: grid;
 }/*# sourceMappingURL=animations.css.map */

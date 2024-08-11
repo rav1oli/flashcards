@@ -12,7 +12,8 @@
         {% block scripts %}{% endblock %}
 
         <!-- stylesheets -->
-        <link rel="stylesheet" href="{% static 'frontend/css/styles.css' %}">
+        <link rel="stylesheet" href="{% static 'frontend/css/tailwind.css' %}" />
+        <!-- <link rel="stylesheet" href="{% static 'frontend/css/styles.css' %}"> -->
         <link rel="stylesheet" href="{% static 'frontend/css/animations.css' %}">
 
         <!-- google fonts -->
@@ -23,31 +24,31 @@
         <link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
 
     </head>
-    <body  hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+    <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="font-barlow bg-slate-50">
 
-        <div class="grey-overlay"></div>
-
-        <ul class="navbar">
-            <div>
-                <a href="{% url 'index' %}"><li class="nav-button">Review</li></a>
-                <a href="{% url 'deck_list' %}"><li class="nav-button">Deck List</li></a>
-                <a href="{% url 'card_list' %}"><li class="nav-button">Card List</li></a>
-                <a href="{% url 'create_card' %}"><li class="nav-button">Create Card</li></a>
-            </div>
-            <div>
+        <ul class="flex justify-between items-center border-b border-b-gray-200 bg-white">
+            <div class="flex items-center">
                 {% if user.is_authenticated %}
-                    <li class="nav-button">Logged in as <b>{{ user.username }}</b></li>
-                    <a href="{% url 'logout' %}"><li class="nav-button">Log Out</li></a>
+                    <a href="{% url 'index' %}"><li class="p-3">Review</li></a>
+                    <a href="{% url 'deck_list' %}"><li class="p-3">Deck List</li></a>
+                    <a href="{% url 'card_list' %}"><li class="p-3">Card List</li></a>
+                    <a href="{% url 'create_card' %}"><li class="p-3 ">Create Card</li></a>
+                {% endif %}
+            </div>
+            <div class="flex items-center">
+                {% if user.is_authenticated %}
+                    <li class="p-3">Logged in as <b>{{ user.username }}</b></li>
+                    <a href="{% url 'logout' %}"><li class="p-3">Log Out</li></a>
                 {% else %}
-                    <a href="{% url 'login' %}"><li class="nav-button">Log In</li></a>
-                    <a href="{% url 'signup' %}"><li class="nav-button">Sign Up</li></a>
+                    <a href="{% url 'login' %}"><li class="p-3">Log In</li></a>
+                    <a href="{% url 'signup' %}"><li class="p-3">Sign Up</li></a>
                 {% endif %}
             </div>
         </ul>
         
         {% block body %}{% endblock %}
 
-        <dialog id="forms"></section>
+        <dialog id="forms" class="rounded-lg bg-slate-50 p-10 w-80"></section>
 
         <script>
             $(function(){

@@ -1,3 +1,5 @@
+{% load crispy_forms_tags %}
+
 <form class="grey-form" 
     hx-post="{{ submit_url }}" 
     hx-include=".selected"
@@ -5,7 +7,7 @@
     hx-swap="outerHTML" >
     {% csrf_token %}
     
-    {{ form.as_p }}
+    {% crispy form %}
 
     <button type="submit" class="form-button close-button">Close</button> <!-- make this a lil x button in the corner -->
 </form>

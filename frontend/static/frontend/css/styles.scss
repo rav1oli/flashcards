@@ -111,22 +111,6 @@ hr {
     word-break: break-word;
 }
 
-.card-front, .label-front {
-    display: grid;
-}
-.card-back, .label-back {
-    display: none;
-}
-
-.card.flipped {
-    .card-front, .label-front {
-        display: none;
-    }
-    .card-back, .label-back {
-        display: grid;
-    }
-}
-
 .last {
     order: 99999;
 }

@@ -5,7 +5,7 @@
 
 {% block body %}
 
-    {% for deck_obj in l %}
+    {% for deck_obj in deck_list %}
     
         <a href="{% url 'deck_review' deck_obj.deck.id %}?new=True">{{ deck_obj }}</a>
     

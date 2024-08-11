@@ -2,43 +2,55 @@
 {% load static %}
 {% load markdown_filter %}
 
-{% block scripts %}
-    <script src="{% static 'frontend/cards.js' %}"></script>
-{% endblock %}
+{% block scripts %}{% endblock %}
 
 {% block body %}
 
-    <main class="main">
+    <div class="container flex flex-col mx-auto my-8">
+        <p class="mb-3 text-6xl">{{ deck.title }}</p>
+        <p class="mb-10 text-3xl">{{ deck.description }}</p>
+    
+        <div class="deck-option">
+            <a href="{% url 'deck_study' deck.pk %}" class="contents"><button class="p-3 bg-offwhite-light shadow-sm">Study</button></a>
+            <a href="{% url 'deck_learn' deck.pk %}?new=True" class="contents"><button class="p-3 bg-offwhite-light shadow-sm">Learn</button></a>
+            <button class="p-3 bg-offwhite-light shadow-sm">Play</button>
+        </div>
+    </div>
 
-        <div class="list-modifiers">
-            <div class="left-list-modifiers">
-                <input type="hidden" name="deck" value="{{ deck.pk }}" />
+    <div class="flex flex-row align-middle justify-between container mx-auto border-t pt-3 border-t-offwhite">
+        <div id="left-list-modifiers" class="flex items-center justify-between w-1/3">
+            <input type="hidden" value="{{ deck.id }}" name="deck" />
 
-                <p>Filter By Tag: </p>
-                <select name="filter" class="filter-select" 
+            <div>
+                <label for="filter-select">Filter By Tag: </label>
+                <select name="filter" id="filter-select" class="p-2 shadow-sm bg-offwhite-light"
                     hx-get="{% url 'card_list' %}"
-                    hx-include=".left-list-modifiers"
+                    hx-include="#order-select"
                     hx-trigger="change"
-                    hx-target="#cards-in-card-list">
-
-                    <option id="all-cards-tag" class="filter-tag" value="0" 
-                        hx-get="{% url 'tag_select_list' %}" 
+                    hx-target="#cards-in-card-list"
+                    hx-push-url="true">
+        
+                    <option id="all-cards-tag" class="filter-option" value="0" 
+                        hx-get="{% url 'tag_select_list' %}?{{ request.GET.urlencode }}" 
                         hx-trigger="load" 
                         hx-target="this"
                         hx-swap="afterend"
                         hx-push-url="false">
                         All Cards</option>
                 </select>
-                
-                <p>Sort By:</p>
-                <select name="order_by" class="order-select" 
+            </div>
+        
+            <div>
+                <label for="order-select">Sort By:</label>
+                <select name="order_by" id="order-select" class="p-2 shadow-sm bg-offwhite-light"
                     hx-get="{% url 'card_list' %}" 
-                    hx-include=".left-list-modifiers"
+                    hx-include="#filter-select"
                     hx-trigger="change" 
-                    hx-target="#cards-in-card-list">
+                    hx-target="#cards-in-card-list"
+                    hx-push-url="true">
 
                     <option class="order-option" value="date_created"
-                        hx-get="{% url 'order_select_list' %}" 
+                        hx-get="{% url 'order_select_list' %}?{{ request.GET.urlencode }}" 
                         hx-trigger="load" 
                         hx-target="this"
                         hx-swap="outerHTML"
@@ -50,48 +62,49 @@
                     <option value="-date_last_reviewed">Most Recently Reviewed</option> -->
                 </select>
             </div>
+
+        </div>
+
+        <div class="flex align-middle justify-between">
+            <!-- delete requests are weird so imma use post for this one -->
+            <img class="ml-5 mr-5" src="{% static 'frontend/icons/bin.svg' %}" width="40px" height="40px" title="Delete Selected Cards" alt="Delete Selected Cards"
+                hx-post="{% url 'delete_card_multiple' %}" 
+                hx-include=".selected, #left-list-modifiers"
+                hx-target="#cards-in-card-list"/>
+
+            <img class="ml-5 mr-5" src="{% static 'frontend/icons/remove.svg' %}" width="40px" height="40px" title="Remove Cards From Decks" alt="Remove Cards From Decks"
+                hx-post="{% url 'remove_card_multiple' deck.id %}"
+                hx-include=".selected, #left-list-modifiers"
+                hx-target="#cards-in-card-list"/>
+
+            <img class="ml-5 mr-5" src="{% static 'frontend/icons/tag.svg' %}" width="40px" height="40px" title="Add Tags to Cards" alt="Add Tags to Cards"
+                hx-get="{% url 'tag_card_multiple_form' %}"
+                hx-target="#forms"/>
+        </div>
+
+    </div>
+
     
-            <div class="list-edit-icons">
-                <img class="icon list-edit-icon list-remove-icon hoverable" src="{% static 'frontend/icons/remove.svg' %}" width="40px" height="40px" title="Remove Cards from Deck" alt="Remove Cards from Deck"
-                    hx-post="{% url 'remove_card_multiple' deck.id %}"
-                    hx-include=".selected, .left-list-modifiers"
-                    hx-target="#cards-in-card-list"/>    
 
-                <img class="icon list-edit-icon list-add-to-deck-icon hoverable" src="{% static 'frontend/icons/add.svg' %}" width="40px" height="40px" title="Add Cards To Decks" alt="Add Cards To Decks"/>
-                <img class="icon list-edit-icon list-add-tags-icon hoverable" src="{% static 'frontend/icons/tag.svg' %}" width="40px" height="40px" title="Add Tags to Cards" alt="Add Tags to Cards"/>
-            </div>
-        </div>
+    <section class="container mx-auto my-8 grid lg:grid-cols-3 gap-4 sm:grid-cols-2 xs:grid-cols-1 justify-center">
+    
+        <section id="cards-in-card-list" class="contents">{% include 'frontend/partials/cards.html' %}</section>
 
-        <div class="deck-meta">
-            <h1>{{ deck.title }}</h1>
-            <h3>{{ deck.description }}</h3>
-        </div>
-
-        <div class="deck-options">
-            <a href="{% url 'deck_study' deck.pk %}"><button class="btn study-btn form-button">Study</button></a>
-            <a href="{% url 'deck_learn' deck.pk %}?new=True"><button class="btn study-btn form-button">Learn</button></a>
-            <button class="btn play-btn form-button">Play</button>
-        </div>
-
-        <div class="list card-list">
-        
-            <section id="cards-in-card-list" class="container">{% include 'frontend/partials/cards.html' %}</section>
-
-            <a href="{% url 'create_card' %}?next={{ request.path|urlencode }}&deck={{ deck.id }}" class="last">
-                <div class="item create-card">
-                        
-                    <div class="card-front">
-                        <div class="wrapper">
-                            <img src="{% static 'frontend/icons/plus.svg' %}" width="40px" height="40px"/>
-                            <p>Create New Card</p>
-                        </div>
-                    </div>
+        <a href="{% url 'create_card' %}?next={{ request.path|urlencode }}&deck={{ deck.id }}" class="contents order-last">
+            <div class="grid grid-rows-10 p-3 h-80 bg-offwhite-light shadow-md">
                     
+                <div class="grid place-items-center row-start-2 row-end-10 w-full text-2xl [word-break:break-word]">
+                    <div class="flex flex-col items-center">
+                        <img src="{% static 'frontend/icons/plus.svg' %}" width="40px" height="40px"/>
+                        <p>Create New Card</p>
+                    </div>
                 </div>
-            </a>
-        
-        </div>
+                
+            </div>
+        </a>
+    
+    </section>
 
-    </main>
+
 
 {% endblock %}

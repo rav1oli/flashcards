@@ -105,21 +105,6 @@ hr {
   word-break: break-word;
 }
 
-.card-front, .label-front {
-  display: grid;
-}
-
-.card-back, .label-back {
-  display: none;
-}
-
-.card.flipped .card-front, .card.flipped .label-front {
-  display: none;
-}
-.card.flipped .card-back, .card.flipped .label-back {
-  display: grid;
-}
-
 .last {
   order: 99999;
 }

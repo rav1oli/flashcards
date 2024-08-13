@@ -1,0 +1,6 @@
+{% include 'frontend/partials/cards.html' %}
+{% include 'frontend/partials/tags.html' %}
+
+<select id="filter-select" hx-swap-oob="innerHTML">
+    {% include 'frontend/partials/tag-select-list.html' %}
+</select>

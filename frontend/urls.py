@@ -15,6 +15,8 @@ urlpatterns = [
     path("deck/<int:pk>", views.deck_detail_view, name="deck_detail"),
 
     path("tag_select_list", views.tag_select_list, name="tag_select_list"),
+    path("tag_select_form", views.tag_select_form, name="tag_select_form"),
+    # path("add_tag", views.add_tag, name="add_tag"),
     path("order_select_list", views.order_select_list, name="order_select_list"),
     
     path("add_tags_to_card/<pk>", views.tag_card_form, name="tag_card_form"),

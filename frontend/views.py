@@ -35,7 +35,7 @@ def index_view(request):
 def card_list_view(request):
 
     if request.htmx:
-        template_name = 'frontend/partials/cards.html'
+        template_name = 'frontend/partials/cards-and-tags.html'
 
     else:
         template_name = 'frontend/list.html'
@@ -46,6 +46,11 @@ def card_list_view(request):
     deck_id = int(request.GET.get('deck', 0))
     if deck_id != 0:
         context['deck'] = Deck.objects.get(pk=deck_id)
+
+    tag_list = request.GET.getlist('filter')
+    tag_list = Tag.objects.filter(pk__in=list(map(int, tag_list)))
+    context['tag_list'] = tag_list
+    context['form'] = TagSelectForm(context={'user': request.user})
 
     return render(request, template_name, context)
 
@@ -84,6 +89,22 @@ def tag_select_list(request):
 
     return render(request, 'frontend/partials/tag-select-list.html', {
         'form': form,
+    })
+
+
+def tag_select_form(request):
+
+    form = TagSelectForm(context={'user': request.user})
+
+    return render(request, 'frontend/modal-forms/tag-select-form.html', {
+        'form': form,
+    })
+
+
+def add_tag(request):
+
+    return render(request, 'frontend/partials/tag.html', {
+        'tag': Tag.objects.get(pk=int(request.GET.get('tag')))
     })
     
 

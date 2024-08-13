@@ -1,22 +1,16 @@
 {% load widget_tweaks %}
 {% load static %}
 
-<form class="tag rounded-sm bg-offwhite-light flex flex-col p-4 [flex-basis:content] shadow-md absolute -top-1 -left-1 min-w-32"
-    hx-post="{% url 'card_list' %}"
-    hx-trigger="change">
-
+<div class="rounded-sm bg-offwhite-light flex flex-col p-4 [flex-basis:content] shadow-md absolute -top-1 -left-1 min-w-32 z-50">
     {% for tag in form.tags %}
-        <button type="button" name="tags" value="{{ tag.data.value }}" class="bg-inherit hover:bg-offwhite-dark p-2 text-left select-none">{{ tag }}</button>
+ 
+        <input type="hidden" name="filter" value="{{ tag.data.value }}" id="{{ tag }}" />
+        <button type="button" class="appearance-none bg-inherit hover:bg-offwhite-dark p-2 text-left select-none" 
+            hx-get="{% url 'card_list' %}"
+            hx-trigger="click"
+            hx-include="#order-select, .tag"
+            hx-target="#cards-in-card-list"
+            hx-push-url="true">{{ tag }}</button>
+
     {% endfor %}
-
-    <button type="button" class="absolute top-2 right-2 opacity-30 hover:opacity-70 transition hover:scale-110"
-        hx-trigger="click"
-        _="on click halt the event's bubbling"
-        hx-delete="{% url 'delete' %}"
-        hx-swap="delete" 
-        hx-target="closest form">
-        <img src="{% static 'frontend/icons/x.svg' %}" width="15px" height="15px" />
-    </button>
-
-</form>
-    
+</div>

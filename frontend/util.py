@@ -30,7 +30,7 @@ def get_user_decks(user):
 def get_filtered_and_sorted_user_cards(request_data, user):
 
     order_by = request_data.get('order_by', 'date_created')
-    tag_id = int(request_data.get('filter', 0))
+    tag_ids = request_data.getlist('filter', 0)
     deck_id = int(request_data.get('deck', 0))
     
     card_list = get_user_cards(user)
@@ -38,10 +38,10 @@ def get_filtered_and_sorted_user_cards(request_data, user):
     if deck_id != 0:
         card_list = card_list.filter(decks__id=deck_id)
 
-    if tag_id == 0:
+    if tag_ids == 0 or tag_ids == ['0']:
         return card_list.order_by(order_by)
     else:
-        return card_list.filter(tags__id=tag_id).order_by(order_by)
+        return card_list.filter(tags__id__in=list(map(int, tag_ids))).order_by(order_by)
     
 
 def get_sorted_user_decks(request_data, user):

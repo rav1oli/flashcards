@@ -1,0 +1,6 @@
+{% load widget_tweaks %}
+
+{% for tag in form.tags %}
+    {{ tag }}
+{% endfor %}
+<option id="all-cards-tag" class="filter-option" value="0" selected>Add A Filter</option>

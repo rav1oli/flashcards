@@ -1,12 +1,19 @@
 {% load static %}
 
-<div class="deck-study-card-container">
+<p class="text-2xl">Review the questions you missed: </p>
 
-    <p>Review the questions you missed: </p>
-    <button 
-        hx-get="{% url 'deck_learn' deck.id %}"
-        hx-swap="outerHTML"
-        hx-target=".deck-study-card-container"
-        hx-push-url="true">>Review</button>
-
+<div class="grid sm:grid-cols-2 xs:grid-cols-1 w-full">
+    {% for card in cards %}
+    
+        <div class="flex flex-row justify-between mx-auto my-5 p-6 bg-offwhite-light rounded-md shadow-sm w-3/4">
+            <p>{{ card.front }}</p>
+        </div>
+    
+    {% endfor %}
 </div>
+
+<button class="bg-offwhite-light p-3 rounded-md shadow-md mt-8"
+    hx-get="{% url 'deck_learn' deck.id %}"
+    hx-target=".learn-card-container"
+    hx-push-url="true">Review</button>
+

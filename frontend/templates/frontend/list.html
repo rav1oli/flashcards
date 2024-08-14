@@ -36,21 +36,6 @@
                         <option id="all-cards-tag" class="filter-option" value="0">Add A Filter</option>              
                     </select>
                 </div>
-
-                    <div id="add-tag" class="tag rounded-sm bg-offwhite-light flex p-3 [flex-basis:content] shadow-sm" value="0"
-                        hx-get="{% url 'tag_select_form' %}"
-                        hx-swap="beforeend"
-                        hx-push-url="false">
-                        <input type="hidden" name="filter" value="0" />
-                        <img src="{% static 'frontend/icons/plus.svg' %}" width="15px" height="15px"/>
-                        <span class="ml-2">Add a filter</span>
-                    </div>
-
-                    <!-- <form class="tag rounded-sm bg-offwhite-light flex flex-col p-4 [flex-basis:content] shadow-md min-w-32 z-50">
-                    
-                        {% render_field form.tags %}
-                        
-                    </form> -->
                 {% endif %}
            
                 <!-- order selector -->
@@ -116,6 +101,7 @@
                         
                     </div>
                 </a>
+                
             {% elif request.path == '/deck_list' %}
                 <section id="decks-in-deck-list" class="contents">{% include 'frontend/partials/decks.html' %}</section>
     

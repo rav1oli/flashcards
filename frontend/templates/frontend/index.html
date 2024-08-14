@@ -7,7 +7,15 @@
 
     {% for deck_obj in deck_list %}
     
-        <a href="{% url 'deck_review' deck_obj.deck.id %}?new=True">{{ deck_obj }}</a>
+        <a href="{% url 'deck_review' deck_obj.deck.id %}?new=True" class="contents">
+            <div class="flex flex-row justify-between container mx-auto my-5 p-8 bg-offwhite-light rounded-md shadow-sm">
+                <b class="text-xl">{{ deck_obj.deck.title }}</b>
+                <div class="flex">
+                    <p class="mr-5">Cards to Review: <b>{{ deck_obj.cards }}</b></p>
+                    <p>Last Reviewed on <b>{{ deck_obj.deck.date_last_reviewed }}</b></p>
+                </div>
+            </div>
+        </a>    
     
     {% endfor %}
 

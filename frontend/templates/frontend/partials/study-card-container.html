@@ -1,47 +1,47 @@
 {% load static %}
 {% load filters %}
 
-<div class="deck-study-card-container">
+<p class="mb-3 text-xl">
+    Card {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+</p>
 
-    <span class="current">
-        Card {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
-    </span>
-
-    {% if page_obj.has_previous %}
-
-        <div class="deck-study-left-arrow" 
-            hx-get="{% url 'deck_study' deck.id %}?page={{ page_obj.previous_page_number }}" 
-            hx-push-url="true"
-            hx-target=".deck-study-card-container"
-            hx-swap="outerHTML">Left Arrow</div>
-
-    {% endif %}
+<div class="flex flex-row items-center justify-between w-full h-full">
     
-    <div class="deck-study-card">
-        <div class="card item">
-            <input type="hidden" name="card_id" value="{{ card.pk }}" />
-        
-            <p class="label label-front">Front: </p>
-            <p class="label label-back">Back: </p>
-        
-            <img class="icon hoverable flip-icon" src="{% static 'frontend/icons/curve-down-arrow.svg' %}" width="50px" height="50px" title="Flip" alt="Flip"/>
-        
-            <div class="card-front">
-                {{ card.front|markdownify|safe }}
-            </div>
-            <div class="card-back">
-                {{ card.back|markdownify|safe }}
-            </div>
-        
+    
+    <img src="{% static 'frontend/icons/left-arrow.svg' %}" width="50px" height="50px" class="hover:scale-110 transition {% if not page_obj.has_previous %}grey{% endif %}" 
+        hx-get="{% if page_obj.has_previous %}{% url 'deck_study' deck.id %}?page={{ page_obj.previous_page_number }}{% endif %}" 
+        hx-push-url="true"
+        hx-target=".study-card-container">
+    
+    <div class="card grid grid-rows-10 shadow-md p-3 h-[500px] mx-auto w-2/3 bg-offwhite-light transition select-none">
+        <input type="hidden" name="card_id" value="{{ card.pk }}" />
+    
+        <div class="flex flex-row justify-between">
+            <p class="label-front">Front: </p>
+            <p class="label-back">Back: </p>
+    
+            <img class="flip-icon col-start-8 opacity-30 hover:opacity-70 hover:scale-110 transition" src="{% static 'frontend/icons/curve-down-arrow.svg' %}" width="40px" height="40px" title="Flip" alt="Flip" 
+                _="on click halt the event's bubbling
+                    add .flipping to closest .card then
+                    wait 150 ms then
+                    toggle .flipped on closest .card then
+                    wait 150 ms then
+                    remove .flipping from closest .card then
+                    "/>
         </div>
-    </div>
     
-    {% if page_obj.has_next %}
-        <div class="deck-study-right-arrow" 
-            hx-get="{% url 'deck_study' deck.id %}?page={{ page_obj.next_page_number }}" 
-            hx-push-url="true"
-            hx-target=".deck-study-card-container"
-            hx-swap="outerHTML">Right Arrow</div>
-    {% endif %}
+        <div class="card-front place-items-center row-start-2 row-end-10 w-full text-2xl [word-break:break-word]">
+            {{ card.front|markdownify|safe }}
+        </div>
+        <div class="card-back place-items-center row-start-2 row-end-10 w-full text-2xl [word-break:break-word]">
+            {{ card.back|markdownify|safe }}
+        </div>
+    
+    </div>
+
+    <img src="{% static 'frontend/icons/right-arrow.svg' %}" width="50px" height="50px" class="hover:scale-110 transition {% if not page_obj.has_next %}grey{% endif %}" 
+        hx-get="{% if page_obj.has_next %}{% url 'deck_study' deck.id %}?page={{ page_obj.next_page_number }}{% endif %}" 
+        hx-push-url="true"
+        hx-target=".study-card-container">
 
 </div>

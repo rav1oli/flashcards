@@ -2,19 +2,17 @@
 {% load static %}
 {% load filters %}
 
-{% block scripts %}
-    <script src="{% static 'frontend/cards.js' %}"></script>
-{% endblock %}
-
 {% block body %}
 
-    <main class="deck-review">
+    <main class="p-8">
 
-        <div class="deck-review-title">{{ deck.title }}</div>
+        <p class="text-4xl mb-4">{{ deck.title }}</p>
 
-        <button type="button" class="form-button" hx-post="{% url 'deck_review' deck.id %}">Save and return</button>
+        <button type="button" class="bg-offwhite-light p-3 rounded-md shadow-md" hx-post="{% url 'deck_review' deck.id %}">Save and Return</button>
 
-        {% include 'frontend/partials/review-card-container.html' %}
+        <div class="container mx-auto flex flex-col items-center h-full review-card-container">
+            {% include 'frontend/partials/review-card-container.html' %}
+        </div>
 
     </main>
 

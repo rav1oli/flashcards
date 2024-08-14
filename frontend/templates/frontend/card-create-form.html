@@ -3,17 +3,15 @@
 {% load filters %}
 {% load crispy_forms_tags %}
 
-{% block scripts %}
-    <script src="{% static 'frontend/cards.js' %}"></script>
-{% endblock %}
+{% block scripts %}{% endblock %}
 
 {% block body %}
 
-    <form method="post" class="container mx-auto my-8">{% csrf_token %}
-        {% crispy form %}
+    <form method="post" action="{% url 'create_card' %}" class="container mx-auto my-8">{% csrf_token %}
+        {{ form|crispy }}
 
         <input type="hidden" name="next" value="{{ request.GET.next }}">
-        <input type="submit" value="Save">
+        <button type="submit" value="Save">Save</button>
     </form>
 
 {% endblock %}

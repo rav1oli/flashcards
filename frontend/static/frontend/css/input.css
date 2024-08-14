@@ -24,3 +24,8 @@
 .flipped .card-front {display: none;}
 
 .list:has(.selected) .list-edit-icons {display: flex;}
+
+.grey {
+    opacity: 0.3;
+    pointer-events: none;
+}

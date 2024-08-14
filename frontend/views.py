@@ -7,10 +7,28 @@ from django.views.generic import CreateView, TemplateView, UpdateView, FormView
 from django.http import HttpResponseRedirect, HttpResponse
 from django_htmx.http import HttpResponseClientRedirect
 from django.core.paginator import Paginator
+from datetime import datetime, timezone
 
 from .models import *
 from .forms import *
 from .util import *
+
+#TODO
+#Add login permissions and such
+#Test review timings
+#Deck Create Form
+#Make Card Create Nicer
+#Crispify Login and Signup views
+#Add Success Banners
+
+#TO NOT DO (because I have no time)
+#Double check all the form validation and stuff
+#Make the Tag Filter look nicer (i tried...)
+#Add Permissions to the models
+#Anonymous Sign In
+#The Play Mode
+#Card Preview while making a card
+#Text resizing for Cards depending on length of text
 
 # Create your views here.
 class SignUpView(CreateView):
@@ -52,6 +70,8 @@ def card_list_view(request):
     context['tag_list'] = tag_list
     context['form'] = TagSelectForm(context={'user': request.user})
 
+    print(card_list)
+
     return render(request, template_name, context)
 
 
@@ -69,6 +89,9 @@ def deck_list_view(request):
 
 
 def deck_detail_view(request, pk):
+
+    if request.htmx:
+        return card_list_view(request)
 
     deck = Deck.objects.get(pk=pk)
     if deck.user != request.user:
@@ -88,15 +111,6 @@ def tag_select_list(request):
     form = TagSelectForm(context={'user': request.user})
 
     return render(request, 'frontend/partials/tag-select-list.html', {
-        'form': form,
-    })
-
-
-def tag_select_form(request):
-
-    form = TagSelectForm(context={'user': request.user})
-
-    return render(request, 'frontend/modal-forms/tag-select-form.html', {
         'form': form,
     })
 
@@ -339,77 +353,6 @@ def delete_card_multiple(request):
 
 
 
-def deck_studyaksjdaksjdbas(request, pk):
-    cards = Card.objects.filter(decks__id=pk).order_by('date_created')
-    p = Paginator(cards, 1)
-
-    if request.htmx:
-        template_name = 'frontend/partials/card-container.html' 
-    else:
-        template_name = 'frontend/deck-study.html'
-
-    blank_history = {'results': {}, 'furthest': 1, 'current': 1}
-
-    if request.method == "POST":
-        
-        history = request.session['deck_study_session']
-        #save results
-        for page_num, confidence in history['results'].items():
-            update_card_review_time(cards[int(page_num) - 1], confidence)
-
-        return HttpResponseClientRedirect(reverse('deck_detail', args=[pk]))
-    
-    else:
-        
-
-        #if navigated to via study button:
-        if request.GET.get('new', False):
-            history = blank_history
-            request.session['deck_study_session'] = history #initialise deck_study_session obj
-            page_num = 1
-            page_obj = p.page(page_num)
-
-        #if form changes, update history
-        elif request.GET.get("change"):
-            history = request.session.get('deck_study_session', blank_history)
-            page_num = int(history['current'])
-
-            history['results'][page_num] = request.GET.get('confidence', "dont_know")
-            request.session['deck_study_session'] = history
-
-        #navigated via arrows
-        else:  
-            page_num = int(request.GET.get('page', 1))
-            history = request.session.get('deck_study_session', blank_history)
-            history['current'] = page_num
-            if page_num > history['furthest']:
-                history['furthest'] = page_num
-
-            request.session['deck_study_session'] = history
-
-        page_obj = p.page(page_num)
-        card = page_obj[0]
-        result = history['results'].get(str(page_num), None)
-        if result:
-            form = ConfidenceForm(initial={'confidence': result})
-            has_results = True
-        else:
-            form = ConfidenceForm()
-            has_results = False
-
-        has_next = "True" if history['furthest'] > page_num else "False"
-
-        return render(request, template_name, {
-            'deck': Deck.objects.get(pk=pk),
-            'page_obj': page_obj,
-            'card': card,
-            'result_times': calculate_result_times(card),
-            'form': form,
-            'has_results': has_results,
-            'has_next': has_next,
-        })
-
-
 def deck_review(request, pk):
     deck = Deck.objects.get(pk=pk)
     page_num = request.GET.get("page", 1)
@@ -419,6 +362,9 @@ def deck_review(request, pk):
         request.session['deck_review_session'] = {
             'card_ids': [card.id for card in cards],
         }
+
+        deck.date_last_reviewed = datetime.now()
+        deck.save()
     
     else:
         session = request.session.get('deck_review_session', {})
@@ -514,8 +460,11 @@ def deck_learn(request, pk):
                     'incorrect': [],
                     'cards': incorrect,
                 }
+
+                cards_to_review = Card.objects.filter(pk__in=incorrect)
                 return render(request, 'frontend/partials/learn-checkpoint.html', {
                     'deck': deck,
+                    'cards': cards_to_review,
                 })
             else:
                 return HttpResponseClientRedirect(reverse('deck_detail', args=[deck.id]))

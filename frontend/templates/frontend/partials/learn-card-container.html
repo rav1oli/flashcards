@@ -1,52 +1,51 @@
 {% load static %}
 {% load filters %}
+<p class="mb-3 text-xl">
+    Card {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+</p>
 
-<div class="deck-study-card-container">
+<div class="card grid grid-rows-10 shadow-md p-3 h-[500px] w-2/3 bg-offwhite-light transition select-none">
+    <input type="hidden" name="card_id" value="{{ card.pk }}" />
 
-    <div>Progress Bar</div>
+    <div class="flex flex-row justify-between">
+        <p class="label-front">Front: </p>
+        <p class="label-back">Back: </p>
 
-    <span class="current">
-        Card {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
-    </span>
-    
-    <div class="deck-study-card">
-        <div class="card item">
-            <input type="hidden" name="card_id" value="{{ card.pk }}" />
-        
-            <p class="label label-front">Front: </p>
-            <p class="label label-back">Back: </p>
-        
-            <img class="icon hoverable flip-icon" src="{% static 'frontend/icons/curve-down-arrow.svg' %}" width="50px" height="50px" title="Flip" alt="Flip" 
-                _="on click remove .grey from .deck-study-footer"/>
-        
-            <div class="card-front">
-                {{ card.front|markdownify|safe }}
-            </div>
-            <div class="card-back">
-                {{ card.back|markdownify|safe }}
-            </div>
-        
-        </div>
+        <img class="flip-icon col-start-8 opacity-30 hover:opacity-70 hover:scale-110 transition" src="{% static 'frontend/icons/curve-down-arrow.svg' %}" width="40px" height="40px" title="Flip" alt="Flip" 
+            _="on click halt the event's bubbling
+                add .flipping to closest .card then
+                wait 150 ms then
+                toggle .flipped on closest .card then
+                wait 150 ms then
+                remove .flipping from closest .card then
+                remove .grey from .deck-study-footer"/>
     </div>
 
-    <form class="deck-study-footer grey"
-        hx-post="{% url 'deck_learn' deck.id %}"
-        hx-trigger="change"
-        hx-swap="outerHTML"
-        hx-target=".deck-study-card-container"
-        hx-push-url="true">
-
-        <input type="hidden" name="card_id" value="{{ card.id }}" />
-        <input type="hidden" name="page_num" value="{{ page_obj.number }}" />
-
-        <div class="radio">
-            <input type="radio" name="response" id="correct" value="correct">
-            <label for="correct">Got It</label>
-
-            <input type="radio" name="response" id="incorrect" value="incorrect">
-            <label for="incorrect">Try Again</label>
-        </div>
-
-    </form>
+    <div class="card-front place-items-center row-start-2 row-end-10 w-full text-2xl [word-break:break-word]">
+        {{ card.front|markdownify|safe }}
+    </div>
+    <div class="card-back place-items-center row-start-2 row-end-10 w-full text-2xl [word-break:break-word]">
+        {{ card.back|markdownify|safe }}
+    </div>
 
 </div>
+
+
+<form class="deck-study-footer grey mt-12"
+    hx-post="{% url 'deck_learn' deck.id %}"
+    hx-trigger="change"
+    hx-target=".learn-card-container"
+    hx-push-url="true">
+
+    <input type="hidden" name="card_id" value="{{ card.id }}" />
+    <input type="hidden" name="page_num" value="{{ page_obj.number }}" />
+
+    <div>
+        <input type="radio" name="response" id="correct" value="correct" >
+        <label for="correct" class="mr-5 text-xl">Got It</label>
+
+        <input type="radio" name="response" id="incorrect" value="incorrect">
+        <label for="incorrect" class="text-xl">Try Again</label>
+    </div>
+
+</form>

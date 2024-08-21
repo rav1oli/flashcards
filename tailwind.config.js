@@ -18,6 +18,11 @@ module.exports = {
         },
       },
 
+      screens: {
+        'single': {'min': '416px', 'max': '848px',},
+        'double': '848px',
+        'triple': '1280px',
+      }
     },
   },
   plugins: [],

@@ -1,13 +1,14 @@
-{% load crispy_forms_tags %}
+{% load widget_tweaks%}
 
-<form class="grey-form" 
+<form class="grey-form flex flex-col" 
     hx-post="{{ submit_url }}" 
     hx-include=".selected"
     hx-target="this" 
     hx-swap="outerHTML" >
     {% csrf_token %}
     
-    {% crispy form %}
+    <p class="mb-3 text-lg">Add to decks:</p>
+    {% render_field form.decks %}
 
-    <button type="submit" class="form-button close-button">Close</button> <!-- make this a lil x button in the corner -->
+    <button type="submit" class="bg-offwhite-light rounded-md shadow-sm p-2 mt-3" value="Save">Save</button>
 </form>

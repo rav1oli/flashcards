@@ -35,7 +35,6 @@
 <form class="deck-review-footer mt-8 grey"
     hx-post="{% url 'deck_review' deck.id %}"
     hx-trigger="change"
-    hx-swap="outerHTML"
     hx-target=".review-card-container"
     hx-push-url="true">
 
@@ -52,3 +51,5 @@
     {% endfor %}
 
 </form>
+
+{% include 'frontend/partials/messages.html' %}

@@ -1,10 +1,10 @@
-<form class="new-tag-form"
+<form id="new-tag-form mt-2 flex flex-row items-center" 
     hx-post="{% url 'tag_create_form' %}"
     hx-target="this"
     hx-swap="outerHTML">
 
-    <input type="text" placeholder="New Tag" name="name"/>
-    <button type="submit">Add New Tag</button>
+    <input type="text" placeholder="New Tag" name="name" class="p-1 bg-offwhite-light rounded-md text-sm"/>
+    <button type="submit" class="text-sm shadow-sm bg-offwhite-dark rounded-md p-1 ml-3">Add New Tag</button>
 
     {{ form.errors }}
 </form>

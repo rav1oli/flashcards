@@ -7,21 +7,16 @@ from django.views.generic import CreateView, TemplateView, UpdateView, FormView
 from django.http import HttpResponseRedirect, HttpResponse
 from django_htmx.http import HttpResponseClientRedirect
 from django.core.paginator import Paginator
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from datetime import datetime, timezone
 
 from .models import *
 from .forms import *
 from .util import *
 
-#TODO
-#Add login permissions and such
-#Test review timings
-#Deck Create Form
-#Make Card Create Nicer
-#Crispify Login and Signup views
-#Add Success Banners
-
 #TO NOT DO (because I have no time)
+#complete success and error banners
 #Double check all the form validation and stuff
 #Make the Tag Filter look nicer (i tried...)
 #Add Permissions to the models
@@ -29,6 +24,8 @@ from .util import *
 #The Play Mode
 #Card Preview while making a card
 #Text resizing for Cards depending on length of text
+#optimise sql queries
+#a search bar for cards
 
 # Create your views here.
 class SignUpView(CreateView):
@@ -36,12 +33,13 @@ class SignUpView(CreateView):
     success_url = reverse_lazy("login")
     template_name = "registration/signup.html"
 
-
+@login_required
 def index_view(request):
     decks = Deck.objects.all()
     deck_list = []
     for deck in decks:
         cards = get_deck_review_cards(deck.pk)
+
         deck_obj = {'deck': deck, 'cards': len(cards)}
         deck_list.append(deck_obj)
 
@@ -49,7 +47,7 @@ def index_view(request):
         'deck_list': deck_list
     })
 
-
+@login_required
 def card_list_view(request):
 
     if request.htmx:
@@ -70,11 +68,9 @@ def card_list_view(request):
     context['tag_list'] = tag_list
     context['form'] = TagSelectForm(context={'user': request.user})
 
-    print(card_list)
-
     return render(request, template_name, context)
 
-
+@login_required
 def deck_list_view(request):
 
     if request.htmx:
@@ -87,7 +83,7 @@ def deck_list_view(request):
 
     return render(request, template_name, {'deck_list': deck_list})
 
-
+@login_required
 def deck_detail_view(request, pk):
 
     if request.htmx:
@@ -105,7 +101,7 @@ def deck_detail_view(request, pk):
     })
 
 
-
+@login_required
 def tag_select_list(request):
 
     form = TagSelectForm(context={'user': request.user})
@@ -114,7 +110,7 @@ def tag_select_list(request):
         'form': form,
     })
 
-
+@login_required
 def add_tag(request):
 
     return render(request, 'frontend/partials/tag.html', {
@@ -132,7 +128,7 @@ def order_select_list(request):
     })
 
 
-
+@login_required
 def card_create_form(request):
 
     if request.method == "POST":
@@ -143,20 +139,29 @@ def card_create_form(request):
             next = request.POST.get('next', reverse("create_card"))
             if next == "":
                 next = reverse("create_card")
+
+            messages.success(request, 'Created!')
             return HttpResponseRedirect(next)
         else: 
-            return render(request, 'frontend/card-create-form.html', {'form': form})
+            return render(request, 'frontend/card-create-form.html', {
+                'form': form,
+                'url': reverse_lazy('create_card'),
+            })
     else: 
 
-        if request.GET.get('deck'):
+        if request.GET.get('deck', False):
+            print('hi')
             initial_deck = Deck.objects.get(pk=request.GET.get('deck'))
         else:
             initial_deck=None
         
         form = CardForm(context={'user': request.user}, initial_deck=initial_deck)
-        return render(request, 'frontend/card-create-form.html', {'form': form})
+        return render(request, 'frontend/card-create-form.html', {
+            'form': form,
+            'url': reverse_lazy('create_card'),
+        })
     
-
+@login_required
 def card_update_form(request, pk):
 
     card = Card.objects.get(pk=pk)
@@ -168,15 +173,23 @@ def card_update_form(request, pk):
             next = request.POST.get('next', reverse("card_list"))
             if next == "":
                 next = reverse("card_list")
+
+            messages.success(request, 'Updated!')
             return HttpResponseRedirect(next)
         else: 
-            return render(request, 'frontend/card-create-form.html', {'form': form})
+            return render(request, 'frontend/card-create-form.html', {
+                'form': form,
+                'url': reverse_lazy('update_card', args=[pk]),
+            })
     
     else:
         form = CardForm(context={'user': request.user}, instance=card)
-        return render(request, 'frontend/card-create-form.html', {'form': form})
+        return render(request, 'frontend/card-create-form.html', {
+            'form': form,
+            'url': reverse_lazy('update_card', args=[pk]),
+        })
 
-
+@login_required
 def deck_create_form(request):
 
     if request.method == "POST":
@@ -184,15 +197,49 @@ def deck_create_form(request):
         if form.is_valid():
             form.instance.user = request.user
             form.save()
+
+            messages.success(request, 'Created!')
             return HttpResponseRedirect(reverse('deck_list'))
         else: 
-            return render(request, 'frontend/deck-create-form.html', {'form': form})
+            return render(request, 'frontend/deck-create-form.html', {
+                'form': form,
+                'url': reverse_lazy('create_deck'),
+            })
     else: 
         form = DeckForm(context={'user': request.user})
-        return render(request, 'frontend/deck-create-form.html', {'form': form})
+        return render(request, 'frontend/deck-create-form.html', {
+            'form': form,
+            'url': reverse_lazy('create_deck'),
+        })
 
 
+def deck_update_form(request, pk):
 
+    deck = Deck.objects.get(pk=pk)
+
+    if request.method == "POST":
+        form = DeckForm(request.POST, context={'user': request.user}, instance=deck)
+        if form.is_valid():
+            form.save()
+            next = request.POST.get('next', reverse("deck_list"))
+
+            messages.success(request, 'Updated!')
+            return HttpResponseRedirect(next)
+        else: 
+            return render(request, 'frontend/deck-create-form.html', {
+                'form': form,
+                'url': reverse_lazy('update_deck', args=[pk]),
+            })
+    
+    else:
+        form = DeckForm(context={'user': request.user}, instance=deck)
+        return render(request, 'frontend/deck-create-form.html', {
+            'form': form,
+            'url': reverse_lazy('update_deck', args=[pk]),
+        })
+
+
+@login_required
 def tag_card_form(request, pk):
 
     card = Card.objects.get(pk=pk)
@@ -201,6 +248,7 @@ def tag_card_form(request, pk):
         form = TagCheckboxModelForm(request.POST, context={'user': request.user}, instance=card)
         if form.is_valid():
             form.save()
+
             return HttpResponse("")
         else: 
             return render(request, 'frontend/modal-forms/tag-card-form.html', {
@@ -214,7 +262,7 @@ def tag_card_form(request, pk):
             'submit_url': reverse_lazy('tag_card_form', args=[form.instance.pk]),
         })
 
-
+@login_required
 def tag_card_multiple_form(request):
 
     if request.method == "POST":
@@ -243,7 +291,7 @@ def tag_card_multiple_form(request):
             'submit_url': reverse_lazy('tag_card_multiple_form')
         })
     
-    
+@login_required 
 def deck_card_form(request, pk):
     card = Card.objects.get(pk=pk)
 
@@ -251,21 +299,22 @@ def deck_card_form(request, pk):
         form = DeckSelectModelForm(request.POST, context={'user': request.user}, instance=card)
         if form.is_valid():
             form.save()
+
             return HttpResponse("")
         else: 
             return render(request, 'frontend/modal-forms/deck-card-form.html', {
                 'form': form,
-                'submit_url': reverse_lazy('deck_card_form', args=[form.instance.pk])
+                'submit_url': reverse_lazy('deck_card_form', args=[pk]),
             })
     
     else:
         form = DeckSelectModelForm(context={'user': request.user}, instance=card)
         return render(request, 'frontend/modal-forms/deck-card-form.html', {
             'form': form,
-            'submit_url': reverse_lazy('deck_card_form', args=[form.instance.pk])
+            'submit_url': reverse_lazy('deck_card_form', args=[pk]),
         })
     
-
+@login_required
 def deck_card_multiple_form(request):
 
     if request.method == "POST":
@@ -294,7 +343,7 @@ def deck_card_multiple_form(request):
                 'submit_url': reverse_lazy('deck_card_multiple_form')
             })
 
-
+@login_required
 def remove_card(request, deck_pk, card_pk):
 
     deck = Deck.objects.get(pk=deck_pk)
@@ -302,7 +351,7 @@ def remove_card(request, deck_pk, card_pk):
 
     return HttpResponse("")
 
-
+@login_required
 def remove_card_multiple(request, pk):
 
     deck = Deck.objects.get(pk=pk)
@@ -312,7 +361,7 @@ def remove_card_multiple(request, pk):
 
     return HttpResponseRedirect(reverse('card_list') + encode_params(request.POST))
 
-
+@login_required
 def tag_create_form(request):
     if request.method == "POST":
 
@@ -321,27 +370,36 @@ def tag_create_form(request):
         if form.is_valid():
             form.instance.user = request.user
             tag = form.save()
+
+            form = TagSelectForm(context={'user': request.user})
             
-            return render(request, 'frontend/partials/new-tag-option.html', {'tag': tag})
+            return render(request, 'frontend/partials/new-tag-option.html', {
+                'tag': tag,
+                'form': form,
+            })
 
         else:
             return render(request, 'frontend/modal-forms/tag-create-form.html', {'form': form})
 
 
-
+@login_required
 def delete_tag(request, pk):
     Tag.objects.get(pk=pk).delete()
 
-    return HttpResponse("")
+    form = TagSelectForm(context={'user': request.user})
+            
+    return render(request, 'frontend/partials/update-tags.html', {
+        'form': form,
+    })
 
-
+@login_required
 def delete_card(request, pk):
     if request.method == "DELETE":
         Card.objects.get(pk=pk).delete()
 
         return HttpResponse("")
     
-
+@login_required
 def delete_card_multiple(request):
     if request.method == "POST":
 
@@ -351,8 +409,15 @@ def delete_card_multiple(request):
 
         return HttpResponseRedirect(reverse('card_list') + encode_params(request.POST))
 
+@login_required
+def delete_deck(request, pk):
+    Deck.objects.get(pk=pk).delete()
+
+    messages.success(request, 'Deleted Deck!')
+    return HttpResponseRedirect(reverse('deck_list'))
 
 
+@login_required
 def deck_review(request, pk):
     deck = Deck.objects.get(pk=pk)
     page_num = request.GET.get("page", 1)
@@ -399,7 +464,7 @@ def deck_review(request, pk):
         'form': ConfidenceForm(),
     })
 
-
+@login_required
 def deck_study(request, pk):
     cards = Card.objects.filter(decks__id=pk).order_by('date_created')
     p = Paginator(cards, 1)
@@ -418,7 +483,7 @@ def deck_study(request, pk):
         'card': page_obj[0],
     })
 
-
+@login_required
 def deck_learn(request, pk):
     deck = Deck.objects.get(pk=pk)
     page_num = request.GET.get("page", 1)
@@ -484,3 +549,7 @@ def deck_learn(request, pk):
 
 def delete(request):
     return HttpResponse(status=201)
+
+
+def update_messages(request):
+    return render(request, 'frontend/partials/messages.html')

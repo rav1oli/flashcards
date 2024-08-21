@@ -3,7 +3,7 @@
 
 {% for card in card_list %}
 
-    <div class="card grid grid-rows-10 shadow-md p-3 h-80 bg-offwhite-light transition select-none" _="on click toggle .selected on closest .card">
+    <div class="w-full card grid grid-rows-10 shadow-md p-3 h-80 bg-offwhite-light transition select-none" _="on click toggle .selected on closest .card">
         <input type="hidden" name="card_id" value="{{ card.pk }}" />
 
         <div class="flex flex-row justify-between">

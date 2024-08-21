@@ -29,3 +29,17 @@
     opacity: 0.3;
     pointer-events: none;
 }
+
+.success {background-color: lightgreen;}
+
+
+
+@layer components {
+    .list-container {
+        @apply single:w-[416px] double:w-[848px] triple:w-[1280px];
+    }
+
+    .list {
+        @apply list-container mx-auto my-8 grid gap-4 single:grid-cols-1 double:grid-cols-2 triple:grid-cols-3 justify-center;
+    }
+}   

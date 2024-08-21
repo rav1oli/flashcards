@@ -1,27 +1,30 @@
 {% load crispy_forms_tags %}
+{% load static %}
 
-<form class="grey-form" 
+<form class="grey-form flex flex-col" 
     hx-post="{{ submit_url }}"
     hx-include=".selected" 
     hx-target="this" 
     hx-swap="outerHTML" >
     {% csrf_token %}
 
+    <p class="mb-3 text-lg col-span-2">Add tags:</p>
+
     {% for field in form.tags %}
 
-        <div class="tag-checkbox-option">
-            {{ field }}
-            <button type="button" 
+        <div class="tag-checkbox-option flex items-center mb-1">
+            <img src="{% static 'frontend/icons/x.svg' %}" width="15px" height="15px" title="Delete Tag" class="mr-8 bg-red-200 p-1 rounded-md"
                 hx-delete="{% url 'delete_tag' field.data.value %}"
                 hx-target="closest .tag-checkbox-option"
-                hx-swap="outerHTML">Delete</button>
+                hx-swap="outerHTML">
+            {{ field }}
         </div>
 
     {% endfor %}
     
     {% include 'frontend/modal-forms/tag-create-form.html' %}
 
-    <button type="submit" class="form-button close-button">Close</button> <!-- make this a lil x button in the corner -->
+    <button type="submit" class="bg-offwhite-light rounded-md shadow-sm p-2 mt-3" value="Save">Save</button>
 </form>
 
 

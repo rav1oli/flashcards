@@ -10,9 +10,9 @@
 
     <main class="list flex flex-col">
 
-        <div class="flex flex-row align-middle justify-between p-3">
-            <div class="order-and-filter flex items-center p-1 justify-between w-1/3">
-                {% if request.path == '/card_list' %}
+        <div class="flex double:flex-row single:flex-col double:items-center single:items-start justify-between p-3 pl-0">
+            <div class="order-and-filter flex double:flex-row single:flex-col double:items-center single:items-start p-1 pl-0 justify-between">
+                {% if request.path == '/cards' %}
 
                 <!-- handler doesn't get deleted when filter updates -->
                 <!-- some of the most scuffed code i've ever written -->
@@ -29,9 +29,9 @@
                     hx-target="#filter-select"
                     hx-push-url="false">
                 
-                    <select name="filter" id="filter-select" class="p-2 shadow-sm bg-offwhite-light"
+                    <select name="filter" id="filter-select" class="p-2 shadow-sm bg-offwhite-light single:mb-4"
                         _="on change send loadCards to #load-card-handler"
-                        hx-swap-oob="outerHTML">
+                        hx-swap-oob="innerHTML">
                 
                         <option id="all-cards-tag" class="filter-option" value="0">Add A Filter</option>              
                     </select>
@@ -39,13 +39,13 @@
                 {% endif %}
            
                 <!-- order selector -->
-                <div>
+                <div class="double:ml-9">
                     <label for="order-select">Sort By:</label>
                     <select name="order_by" id="order-select" class="p-2 shadow-sm bg-offwhite-light"
-                        hx-get="{% if request.path == '/card_list' %}{% url 'card_list' %}{% elif request.path == '/deck_list' %}{% url 'deck_list' %}{% endif %}" 
-                        hx-include="#filter-select"
+                        hx-get="{% if request.path == '/cards' %}{% url 'card_list' %}{% elif request.path == '/decks' %}{% url 'deck_list' %}{% endif %}" 
+                        hx-include="#filter-select, .tag"
                         hx-trigger="change" 
-                        hx-target="{% if request.path == '/card_list' %}#cards-in-card-list{% elif request.path == '/deck_list' %}#decks-in-deck-list{% endif %}"
+                        hx-target="{% if request.path == '/cards' %}#cards-in-card-list{% elif request.path == '/decks' %}#decks-in-deck-list{% endif %}"
                         hx-push-url="true">
     
                         <option class="order-option" value="date_created"
@@ -63,11 +63,12 @@
                 </div>
             </div>
     
-            {% if request.path == '/card_list'%}
+            {% if request.path == '/cards'%}
                 <div class="list-edit-icons hidden align-middle justify-between">
                     <!-- delete requests are weird so imma use post for this one -->
                     <img class="ml-5 mr-5 opacity-30 hover:opacity-70 transition hover:scale-110" src="{% static 'frontend/icons/bin.svg' %}" width="40px" height="40px" title="Delete Selected Cards" alt="Delete Selected Cards"
                         hx-post="{% url 'delete_card_multiple' %}" 
+                        hx-confirm="Are you sure you want to delete these cards?"
                         hx-include=".selected, #left-list-modifiers"
                         hx-target="#cards-in-card-list"/>
     
@@ -84,9 +85,9 @@
 
         {% include 'frontend/partials/tags.html' %}
 
-        <section class="container mx-auto my-8 grid lg:grid-cols-3 gap-4 sm:grid-cols-2 xs:grid-cols-1 justify-center">
+        <section class="list">
 
-            {% if request.path == '/card_list' %}
+            {% if request.path == '/cards' %}
                 <section id="cards-in-card-list" class="contents">{% include 'frontend/partials/cards.html' %}</section>
     
                 <a href="{% url 'create_card' %}" class="contents order-last">
@@ -102,7 +103,7 @@
                     </div>
                 </a>
                 
-            {% elif request.path == '/deck_list' %}
+            {% elif request.path == '/decks' %}
                 <section id="decks-in-deck-list" class="contents">{% include 'frontend/partials/decks.html' %}</section>
     
                 <a href="{% url 'create_deck' %}" class="contents order-last">

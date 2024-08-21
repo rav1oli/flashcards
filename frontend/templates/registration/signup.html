@@ -1,12 +1,27 @@
 {% extends "layout.html" %}
+{% load widget_tweaks %}
 
 {% block body %}
 
-<h2>Sign up</h2>
-<form method="post">
-  {% csrf_token %}
-  {{ form }}
-  <button type="submit">Sign Up</button>
-</form>
+    <form method="post" class="p-28 w-1/3 rounded-lg shadow-md bg-white mx-auto mt-16 flex flex-col items-center">
+        {% csrf_token %}
+
+        <div>
+            <p>Username: </p>
+            {% render_field form.username class+="bg-offwhite-light mb-6 w-80 shadow-sm p-2" placeholder="Enter your username" %}
+        </div>
+
+        <div>
+            <p>Password: </p>
+            {% render_field form.password1 class+="bg-offwhite-light mb-6 w-80 shadow-sm p-2" placeholder="Enter your password"%}
+        </div>
+
+        <div>
+          <p>Password Confirm: </p>
+          {% render_field form.password2 class+="bg-offwhite-light mb-6 w-80 shadow-sm p-2" placeholder="Confirm your password"%}
+      </div>
+
+        <button type="submit" class="bg-offwhite-light rounded-md shadow-md px-9 py-3 mt-8 text-xl" value="Save">Log In</button>
+    </form>
 
 {% endblock %}

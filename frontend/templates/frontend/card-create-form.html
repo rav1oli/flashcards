@@ -1,17 +1,38 @@
 {% extends "layout.html" %}
 {% load static %}
 {% load filters %}
-{% load crispy_forms_tags %}
+{% load widget_tweaks %}
 
 {% block scripts %}{% endblock %}
 
 {% block body %}
 
-    <form method="post" action="{% url 'create_card' %}" class="container mx-auto my-8">{% csrf_token %}
-        {{ form|crispy }}
+    <form method="post" action="{{ url }}" class="container mx-auto my-8 flex flex-col items-center">{% csrf_token %}
+
+        <div>
+            <p>Front: </p>
+            {% render_field form.front class+="bg-offwhite-light mb-3" %}
+        </div>
+        
+        <div>
+            <p>Back: </p>
+            {% render_field form.back class+="bg-offwhite-light mb-3" %}
+        </div>
+
+        <div class="flex justify-between w-80">
+            <div>
+                <p>Add Tags: </p>
+                {% render_field form.tags %}
+            </div>
+    
+            <div>
+                <p>Add to Decks: </p>
+                {% render_field form.decks %}
+            </div>
+        </div>
 
         <input type="hidden" name="next" value="{{ request.GET.next }}">
-        <button type="submit" value="Save">Save</button>
+        <button type="submit" class="bg-offwhite-light rounded-md shadow-sm px-9 py-3 mt-8 text-xl" value="Save">Save</button>
     </form>
 
 {% endblock %}

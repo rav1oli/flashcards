@@ -1,24 +1,29 @@
 {% extends 'layout.html' %}
 {% load static %}
+{% load widget_tweaks %}
 
 {% block body %}
     
-    <form action="{% url 'create_deck' %}" method="post" class="deck-form">
+    <form action="{{ url }}" method="post" class="container mx-auto my-8 flex flex-col items-center">
         {% csrf_token %}
 
-        <p>Deck title</p>
-        {{ form.title }}
+        <div>
+            <p>Title: </p>
+            {% render_field form.title class+="w-80 mb-3 bg-offwhite-light"%}
+        </div>
+        
+        <div>
+            <p>Description: </p>
+            {% render_field form.description class+="mb-3 bg-offwhite-light" %}
+        </div>
 
-        <p>Deck description</p>
-        {{ form.description }}
+        <div>
+            <p>Add Cards: <span class="text-sm">(ctrl+click to select multiple)</span></p>
+            {% render_field form.cards class+="w-80 bg-offwhite-light" %}
+        </div>
 
-        <p>Cards (ctrl + click to select multiple)</p>
-        {{ form.cards }}
-
-        {% if form.errors %}
-            <p>There was an error with the form. Please try again.</p>
-        {% endif %}
-        <button type="submit" class="form-button">Submit</button>
+        <input type="hidden" name="next" value="{{ request.GET.next }}">
+        <button type="submit" class="bg-offwhite-light rounded-md shadow-sm px-9 py-3 mt-8 text-xl" value="Save">Save</button>
     </form>
 
 {% endblock %}

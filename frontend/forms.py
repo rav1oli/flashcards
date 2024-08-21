@@ -7,7 +7,6 @@ class DeckForm(DynamicFormMixin, forms.ModelForm):
     cards = DynamicField(
         forms.ModelMultipleChoiceField,
         queryset=lambda form: Card.objects.filter(user=form.context['user']),
-        widget=lambda _: forms.CheckboxSelectMultiple,
         required=False,
     )
 

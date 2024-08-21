@@ -1,17 +1,17 @@
 {% load static %}
 
 
-    <section id="tag-list" class="container mx-auto my-8 flex flex-row justify-start items-center" hx-swap-oob="true">
-        {% for tag in tag_list %}
-            
-            <div class="tag rounded-xl bg-offwhite-light flex p-3 [flex-basis:content] mr-3">
-                <input type="hidden" name="filter" value="{{ tag.id }}" id="tag-{{ tag.id }}" />
-                <img src="{% static 'frontend/icons/x.svg' %}" width="10px" height="10px" class="opacity-30 hover:opacity-70 transition hover:scale-110"
-                    _="on click 
-                        remove .tag from closest .tag then
-                        send loadCards to #load-card-handler" />
-                <span class="text-xs ml-2">{{ tag.name }}</span>
-            </div>
-    
-        {% endfor %}
-    </section>
+<section id="tag-list" class="container mx-auto double:my-8 single:my-2 flex flex-row justify-start items-center" hx-swap-oob="true">
+    {% for tag in tag_list %}
+        
+        <div class="tag rounded-xl bg-offwhite-light flex p-3 [flex-basis:content] mr-3">
+            <input type="hidden" name="filter" value="{{ tag.id }}" id="tag-{{ tag.id }}" />
+            <img src="{% static 'frontend/icons/x.svg' %}" width="10px" height="10px" class="opacity-30 hover:opacity-70 transition hover:scale-110"
+                _="on click 
+                    remove .tag from closest .tag then
+                    send loadCards to #load-card-handler" />
+            <span class="text-xs ml-2">{{ tag.name }}</span>
+        </div>
+
+    {% endfor %}
+</section>

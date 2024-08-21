@@ -4,23 +4,28 @@
 
 {% block body %}
 
-    <div class="container flex flex-col mx-auto my-8">
+    <div class="list-container flex flex-col mx-auto my-8">
         <p class="mb-3 text-6xl">{{ deck.title }}</p>
         <p class="mb-10 text-3xl">{{ deck.description }}</p>
     
         
-            <div class="deck-option {% if not card_list|length > 0%}grey{% endif %}">
-                <a href="{% url 'deck_study' deck.pk %}" class="contents"><button class="p-3 bg-offwhite-light shadow-sm">Study</button></a>
-                <a href="{% url 'deck_learn' deck.pk %}?new=True" class="contents"><button class="p-3 bg-offwhite-light shadow-sm">Learn</button></a>
-                <button class="p-3 bg-offwhite-light shadow-sm">Play</button>
+        <div class="flex">
+            <div class="{% if not card_list|length > 0%}grey{% endif %}">
+                <a href="{% url 'deck_study' deck.pk %}" class="contents"><button class="p-3 bg-offwhite-light shadow-sm rounded-md mr-3">Study</button></a>
+                <a href="{% url 'deck_learn' deck.pk %}?new=True" class="contents"><button class="p-3 bg-offwhite-light shadow-sm rounded-md mr-3">Learn</button></a>
             </div>
+    
+            <a class="contents" href="{% url 'update_deck' deck.pk %}?next={{ request.path }}"><button class="p-3 bg-offwhite-light shadow-sm rounded-md mr-3">Edit</button></a>
+    
+            <a class="contents" href="{% url 'delete_deck' deck.pk %}"><button class="p-3 bg-red-200 shadow-sm rounded-md mr-3">Delete</button></a>
+        </div>
 
     </div>
 
-    <main class="list flex flex-col border border-t-offwhite">
+    <main class="list flex flex-col border-t border-t-offwhite-dark">
 
-        <div class="flex flex-row align-middle justify-between pt-8 container mx-auto">
-            <div class="order-and-filter flex items-center justify-between w-1/3">
+        <div class="flex double:flex-row single:flex-col double:items-center single:items-start justify-between p-3 pl-0">
+            <div class="order-and-filter flex double:flex-row single:flex-col double:items-center single:items-start p-1 pl-0 justify-between">
 
                 <!-- handler doesn't get deleted when filter updates -->
                 <!-- some of the most scuffed code i've ever written -->
@@ -39,7 +44,7 @@
 
                     <input type="hidden" name="deck" value="{{ deck.id }}" />
                 
-                    <select name="filter" id="filter-select" class="p-2 shadow-sm bg-offwhite-light"
+                    <select name="filter" id="filter-select" class="p-2 shadow-sm bg-offwhite-light single:mb-4"
                         _="on change send loadCards to #load-card-handler"
                         hx-swap-oob="outerHTML">
                 
@@ -48,7 +53,7 @@
                 </div>
            
                 <!-- order selector -->
-                <div>
+                <div class="double:ml-9">
                     <label for="order-select">Sort By:</label>
                     <select name="order_by" id="order-select" class="p-2 shadow-sm bg-offwhite-light"
                     hx-get="{% url 'deck_detail' deck.id %}" 
@@ -92,11 +97,11 @@
 
         {% include 'frontend/partials/tags.html' %}
 
-        <section class="container mx-auto my-8 grid lg:grid-cols-3 gap-4 sm:grid-cols-2 xs:grid-cols-1 justify-center">
+        <section class="list">
 
             <section id="cards-in-card-list" class="contents">{% include 'frontend/partials/cards.html' %}</section>
 
-            <a href="{% url 'create_card' %}?next={{ request.path }}?deck={{ deck.id }}" class="contents order-last">
+            <a href="{% url 'create_card' %}?next={{ request.path }}&deck={{ deck.id }}" class="contents order-last">
                 <div class="grid grid-rows-10 p-3 h-80 bg-offwhite-light shadow-md select-none">
                         
                     <div class="grid place-items-center row-start-2 row-end-10 w-full text-2xl [word-break:break-word]">

@@ -8,7 +8,7 @@
 
         <p class="text-4xl mb-4">{{ deck.title }}</p>
 
-        <button type="button" class="bg-offwhite-light p-3 rounded-md shadow-md" hx-post="{% url 'deck_review' deck.id %}">Save and Return</button>
+        <a href="{% url 'index' %}" class="contents"><button class="bg-offwhite-light p-3 rounded-md shadow-md">Back to deck</button></a>
 
         <div class="container mx-auto flex flex-col items-center h-full review-card-container">
             {% include 'frontend/partials/review-card-container.html' %}

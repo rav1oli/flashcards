@@ -9,17 +9,17 @@
 
         <div>
             <p>Title: </p>
-            {% render_field form.title class+="w-80 mb-3 bg-offwhite-light"%}
+            {% render_field form.title class+="w-80 mb-3 bg-offwhite-light rounded-sm" %}
         </div>
         
         <div>
             <p>Description: </p>
-            {% render_field form.description class+="mb-3 bg-offwhite-light" %}
+            {% render_field form.description class+="mb-3 bg-offwhite-light rounded-sm" %}
         </div>
 
         <div>
             <p>Add Cards: <span class="text-sm">(ctrl+click to select multiple)</span></p>
-            {% render_field form.cards class+="w-80 bg-offwhite-light" %}
+            {% render_field form.cards class+="w-80 bg-offwhite-light p-2 rounded-sm" %}
         </div>
 
         <input type="hidden" name="next" value="{{ request.GET.next }}">

@@ -9,17 +9,42 @@
 
     <form method="post" action="{{ url }}" class="container mx-auto my-8 flex flex-col items-center">{% csrf_token %}
 
+        <div class="card grid grid-rows-10 shadow-md p-3 h-72 w-96 mb-8 bg-offwhite-light transition select-none">
+            <input type="hidden" name="card_id" value="{{ card.pk }}" />
+    
+            <div class="flex flex-row justify-between">
+                <p class="label-front">Front: </p>
+                <p class="label-back">Back: </p>
+    
+                <img class="flip-icon col-start-8 opacity-30 hover:opacity-70 hover:scale-110 transition" src="{% static 'frontend/icons/curve-down-arrow.svg' %}" width="25px" height="25px" title="Flip" alt="Flip" 
+                    _="on click halt the event's bubbling
+                        add .flipping to closest .card then
+                        wait 150 ms then
+                        toggle .flipped on closest .card then
+                        wait 150 ms then
+                        remove .flipping from closest .card then"/>
+            </div>
+    
+            <div class="card-front place-items-center row-start-2 row-end-10 w-full text-2xl [word-break:break-word]">
+                <span class="text-center">{{ card.front|markdownify|safe }}</span>
+            </div>
+            <div class="card-back place-items-center row-start-2 row-end-10 w-full text-2xl [word-break:break-word]">
+                <span class="text-center">{{ card.back|markdownify|safe }}</span>
+            </div>
+    
+        </div>
+
         <div>
             <p>Front: </p>
-            {% render_field form.front class+="bg-offwhite-light mb-3" %}
+            {% render_field form.front maxlength="310" class+="bg-offwhite-light mb-3 h-24 form-front w-96" %}
         </div>
         
         <div>
             <p>Back: </p>
-            {% render_field form.back class+="bg-offwhite-light mb-3" %}
+            {% render_field form.back maxlength="310" class+="bg-offwhite-light mb-3 h-24 form-back w-96" %}
         </div>
 
-        <div class="flex justify-between w-80">
+        <div class="flex justify-between w-96">
             <div>
                 <p>Add Tags: </p>
                 {% render_field form.tags %}
@@ -34,6 +59,51 @@
         <input type="hidden" name="next" value="{{ request.GET.next }}">
         <button type="submit" class="bg-offwhite-light rounded-md shadow-sm px-9 py-3 mt-8 text-xl" value="Save">Save</button>
     </form>
+
+    <script>
+        const cardFront = document.querySelector('.card-front');
+        const cardBack = document.querySelector('.card-back');
+        const formFront = document.querySelector('.form-front');
+        const formBack = document.querySelector('.form-back');
+
+        function applyLength(newEl, length){
+            if (length > 216){
+                newEl.className += 'text-base'
+            } else if (length > 196){
+                newEl.className += 'text-lg'
+            } else if (length > 128){
+                newEl.className += 'text-xl'
+            }
+        }
+
+        formFront.addEventListener('keyup', (e) => {
+            //swap out the text node
+            oldEl = cardFront.querySelector('span');
+
+            newEl = document.createElement('span');
+            newEl.innerHTML = e.target.value;
+            newEl.className = 'text-center ';
+
+            //update font size
+            applyLength(newEl, e.target.value.length);
+
+            cardFront.replaceChild(newEl, oldEl);
+        });
+
+        formBack.addEventListener('keyup', (e) => {
+            // swap out the text node
+            oldEl = cardBack.querySelector('span');
+
+            newEl = document.createElement('span');
+            newEl.innerHTML = e.target.value;
+            newEl.className = 'text-center ';
+
+            //update font size
+            applyLength(newEl, e.target.value.length);
+            
+            cardBack.replaceChild(newEl, oldEl);
+        });
+    </script>
 
 {% endblock %}
 

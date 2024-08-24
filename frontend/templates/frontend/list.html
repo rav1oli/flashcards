@@ -10,7 +10,7 @@
 
     <main class="list flex flex-col">
 
-        <div class="flex double:flex-row single:flex-col double:items-center single:items-start justify-between p-3 pl-0">
+        <div class="flex flex-row items-center justify-between p-3 pl-0">
             <div class="order-and-filter flex double:flex-row single:flex-col double:items-center single:items-start p-1 pl-0 justify-between">
                 {% if request.path == '/cards' %}
 
@@ -40,7 +40,7 @@
            
                 <!-- order selector -->
                 <div class="double:ml-9">
-                    <label for="order-select">Sort By:</label>
+                    <label for="order-select" class="single:hidden">Sort By:</label>
                     <select name="order_by" id="order-select" class="p-2 shadow-sm bg-offwhite-light"
                         hx-get="{% if request.path == '/cards' %}{% url 'card_list' %}{% elif request.path == '/decks' %}{% url 'deck_list' %}{% endif %}" 
                         hx-include="#filter-select, .tag"
@@ -66,17 +66,17 @@
             {% if request.path == '/cards'%}
                 <div class="list-edit-icons hidden align-middle justify-between">
                     <!-- delete requests are weird so imma use post for this one -->
-                    <img class="ml-5 mr-5 opacity-30 hover:opacity-70 transition hover:scale-110" src="{% static 'frontend/icons/bin.svg' %}" width="40px" height="40px" title="Delete Selected Cards" alt="Delete Selected Cards"
+                    <img class="mr-5 single:mr-3 opacity-30 hover:opacity-70 transition hover:scale-110" src="{% static 'frontend/icons/bin.svg' %}" width="30px" height="30px" title="Delete Selected Cards" alt="Delete Selected Cards"
                         hx-post="{% url 'delete_card_multiple' %}" 
                         hx-confirm="Are you sure you want to delete these cards?"
                         hx-include=".selected, #left-list-modifiers"
                         hx-target="#cards-in-card-list"/>
     
-                    <img class="ml-5 mr-5 opacity-30 hover:opacity-70 transition hover:scale-110" src="{% static 'frontend/icons/add.svg' %}" width="40px" height="40px" title="Add Cards To Decks" alt="Add Cards To Decks"
+                    <img class="ml-5 mr-5 single:mr-3 single:ml-3 opacity-30 hover:opacity-70 transition hover:scale-110" src="{% static 'frontend/icons/add.svg' %}" width="30px" height="30px" title="Add Cards To Decks" alt="Add Cards To Decks"
                         hx-get="{% url 'deck_card_multiple_form' %}"
                         hx-target="#forms"/>
     
-                    <img class="ml-5 mr-5 opacity-30 hover:opacity-70 transition hover:scale-110" src="{% static 'frontend/icons/tag.svg' %}" width="40px" height="40px" title="Add Tags to Cards" alt="Add Tags to Cards"
+                    <img class="ml-5 single:ml-3 opacity-30 hover:opacity-70 transition hover:scale-110" src="{% static 'frontend/icons/tag.svg' %}" width="30px" height="30px" title="Add Tags to Cards" alt="Add Tags to Cards"
                         hx-get="{% url 'tag_card_multiple_form' %}"
                         hx-target="#forms"/>
                 </div>

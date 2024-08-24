@@ -31,12 +31,22 @@ class Card(models.Model):
         (7, "1 month"),
     ]
 
+    #based on the tailwind classes, second parameter is the no. of characters for each break point.
+    FONT_SIZE_CHOICES = [
+        ("text-base", "216"),
+        ("text-lg", "192"),
+        ("text-xl", "128"),
+        ("text-2xl", "0"),
+    ]
+
     #time intervals corresponding with each box.
     TIME_INTERVALS = [timedelta(0), timedelta(days=1), timedelta(days=2), timedelta(days=4), timedelta(days=7), timedelta(days=14), timedelta(days=30)]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    front = models.TextField()
-    back = models.TextField()
+    front = models.TextField(max_length=310)
+    front_font_size = models.CharField(choices=FONT_SIZE_CHOICES, max_length=16, default="text-2xl")
+    back = models.TextField(max_length=310)
+    back_font_size = models.CharField(choices=FONT_SIZE_CHOICES, max_length=16, default="text-2xl")
     
     date_created = models.DateTimeField(auto_now_add=True)
     date_edited = models.DateTimeField(auto_now=True)

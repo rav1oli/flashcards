@@ -44,10 +44,10 @@
                     "/>
         </div>
 
-        <div class="card-front place-items-center row-start-2 row-end-10 w-full text-2xl [word-break:break-word]">
+        <div class="card-front place-items-center row-start-2 row-end-10 w-full {{card.front_font_size}} [word-break:break-word]">
             {{ card.front|markdownify|safe }}
         </div>
-        <div class="card-back place-items-center row-start-2 row-end-10 w-full text-2xl [word-break:break-word]">
+        <div class="card-back place-items-center row-start-2 row-end-10 w-full {{card.back_font_size}} [word-break:break-word]">
             {{ card.back|markdownify|safe }}
         </div>
 

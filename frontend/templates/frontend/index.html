@@ -5,7 +5,7 @@
 
 {% block body %}
 
-    <div class="container flex flex-col mx-auto -scroll-my-8">
+    <div class="container flex flex-col mx-auto my-8">
         <p class="mb-3 text-4xl">Decks to Review</p>
     </div>
 
@@ -16,7 +16,7 @@
                 <b class="text-xl">{{ deck_obj.deck.title }}</b>
                 <div class="flex">
                     <p class="mr-5">Cards to Review: <b>{{ deck_obj.cards }}</b></p>
-                    <p>Last Reviewed on <b>{{ deck_obj.deck.date_last_reviewed }}</b></p>
+                    <p class="single:hidden">Last Reviewed on <b>{{ deck_obj.deck.date_last_reviewed }}</b></p>
                 </div>
             </div>
         </a>    

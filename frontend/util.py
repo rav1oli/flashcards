@@ -1,5 +1,5 @@
 from .models import *
-from datetime import date
+from datetime import date, datetime
 
 #CONFIDENCE_MATRIX[box][confidence (0 is confident, 4 is dont_know)] will give you the new box.
 CONFIDENCE_MATRIX = [
@@ -79,6 +79,7 @@ def update_card_review_time(card, confidence):
         new_box = CONFIDENCE_MATRIX[box][3]
 
     card.review_interval_box = new_box
+    card.date_last_reviewed = datetime.now()
     card.save()
     return
 

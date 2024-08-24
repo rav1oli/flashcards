@@ -24,7 +24,7 @@
 
     <main class="list flex flex-col border-t border-t-offwhite-dark">
 
-        <div class="flex double:flex-row single:flex-col double:items-center single:items-start justify-between p-3 pl-0">
+        <div class="flex flex-row items-center justify-between p-3 pl-0">
             <div class="order-and-filter flex double:flex-row single:flex-col double:items-center single:items-start p-1 pl-0 justify-between">
 
                 <!-- handler doesn't get deleted when filter updates -->
@@ -54,7 +54,7 @@
            
                 <!-- order selector -->
                 <div class="double:ml-9">
-                    <label for="order-select">Sort By:</label>
+                    <label for="order-select" class="single:hidden">Sort By:</label>
                     <select name="order_by" id="order-select" class="p-2 shadow-sm bg-offwhite-light"
                     hx-get="{% url 'deck_detail' deck.id %}" 
                         hx-include="#filter-select"
@@ -78,17 +78,17 @@
 
                 <div class="list-edit-icons hidden align-middle justify-between">
                     <!-- delete requests are weird so imma use post for this one -->
-                    <img class="ml-5 mr-5 opacity-30 hover:opacity-70 transition hover:scale-110" src="{% static 'frontend/icons/bin.svg' %}" width="40px" height="40px" title="Delete Selected Cards" alt="Delete Selected Cards"
+                    <img class="mr-5 single:mr-3 opacity-30 hover:opacity-70 transition hover:scale-110" src="{% static 'frontend/icons/bin.svg' %}" width="30px" height="30px" title="Delete Selected Cards" alt="Delete Selected Cards"
                         hx-post="{% url 'delete_card_multiple' %}" 
                         hx-include=".selected, #left-list-modifiers"
                         hx-target="#cards-in-card-list"/>
     
-                    <img class="ml-5 mr-5 opacity-30 hover:opacity-70 transition hover:scale-110" src="{% static 'frontend/icons/remove.svg' %}" width="40px" height="40px" title="Remove Cards From Decks" alt="Remove Cards from Decks"
+                    <img class="ml-5 mr-5 single:ml-3 single:mr-3 opacity-30 hover:opacity-70 transition hover:scale-110" src="{% static 'frontend/icons/remove.svg' %}" width="30px" height="30px" title="Remove Cards From Decks" alt="Remove Cards from Decks"
                         hx-get="{% url 'remove_card_multiple' deck.id %}"
                         hx-include=".selected, #left-list-modifiers"
                         hx-target="#cards-in-card-list"/>
     
-                    <img class="ml-5 mr-5 opacity-30 hover:opacity-70 transition hover:scale-110" src="{% static 'frontend/icons/tag.svg' %}" width="40px" height="40px" title="Add Tags to Cards" alt="Add Tags to Cards"
+                    <img class="ml-5 single:ml-3 opacity-30 hover:opacity-70 transition hover:scale-110" src="{% static 'frontend/icons/tag.svg' %}" width="30px" height="30px" title="Add Tags to Cards" alt="Add Tags to Cards"
                         hx-get="{% url 'tag_card_multiple_form' %}"
                         hx-target="#forms"/>
                 </div>

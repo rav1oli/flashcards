@@ -45,10 +45,26 @@ class CardForm(DynamicFormMixin, forms.ModelForm):
         elif deck:
             self.fields['decks'].initial = deck
 
-
     def save(self, commit=True):
+
+        def get_font_size(length):
+            if length > 216:
+                font_size = "text-base"
+            elif length > 192:
+                font_size = "text-lg"
+            elif length > 128:
+                font_size = "text-xl"
+            else:
+                font_size = "text-2xl"
+
+            return font_size
+
         # Retrieve the card instance being saved
         card_instance = super().save(commit=False)
+
+        #update font size
+        card_instance.front_font_size = get_font_size(len(card_instance.front))
+        card_instance.back_font_size = get_font_size(len(card_instance.back))
         
         # If the instance is saved, update the many-to-many relationship
         if commit:
